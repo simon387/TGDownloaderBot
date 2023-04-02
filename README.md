@@ -1,2 +1,2 @@
 # TGDownloaderBot
-Telegram Download Bot
+Telegram Downloader Bot
