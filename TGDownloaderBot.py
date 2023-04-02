@@ -10,7 +10,8 @@ from logging.handlers import RotatingFileHandler
 import validators
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.constants import ParseMode
-from telegram.ext import ApplicationBuilder, CallbackContext, CommandHandler, ContextTypes, Application, AIORateLimiter, filters, MessageHandler
+from telegram.ext import ApplicationBuilder, CallbackContext, CommandHandler, ContextTypes, Application, AIORateLimiter, filters, MessageHandler, \
+	CallbackQueryHandler
 
 import constants as c
 from BotApp import BotApp
@@ -99,20 +100,28 @@ async def download(update: Update, context: CallbackContext):
 	message = c.SPACE.join(context.args).strip()
 	if validators.url(message):
 		if "https://www.youtube." in message and "/watch?" in message:
-
 			keyboard = [
 				[
-					InlineKeyboardButton("Download mp3", callback_data='callback_1'),
-					InlineKeyboardButton("Download Video", callback_data='callback_2'),
+					InlineKeyboardButton("Download mp3", callback_data='MP3' + message),
+					InlineKeyboardButton("Download Video", callback_data='MP4' + message),
 				]
 			]
 			reply_markup = InlineKeyboardMarkup(keyboard)
-
-			await context.bot.send_message(chat_id=update.effective_chat.id, text="hai inserito un url di youtube", reply_markup=reply_markup)
+			await context.bot.send_message(chat_id=update.effective_chat.id, text="Hai inserito un url di youtube", reply_markup=reply_markup)
 		else:
-			await context.bot.send_message(chat_id=update.effective_chat.id, text="hai inserito un url non di youtube")
+			await context.bot.send_message(chat_id=update.effective_chat.id, text="Hai inserito un url non di youtube")
 	else:
 		await context.bot.send_message(chat_id=update.effective_chat.id, text="Non hai inserito un url valido")
+
+
+async def keyboard_callback(update: Update, context: CallbackContext):
+	query = update.callback_query
+	prefix = query[0:3]
+	url = query[3:]
+
+	print('query.data:', query.data)
+	await query.answer(f'selected: {query.data}')
+	await context.bot.send_message(chat_id=update.effective_chat.id, text="ciao")
 
 
 if __name__ == '__main__':
@@ -128,5 +137,6 @@ if __name__ == '__main__':
 	application.add_handler(CommandHandler('version', send_version))
 	application.add_handler(CommandHandler('download', download))
 	application.add_handler(MessageHandler(filters.COMMAND, unknown_command))
+	application.add_handler(CallbackQueryHandler(keyboard_callback))
 	application.add_error_handler(error_handler)
 	application.run_polling(allowed_updates=Update.ALL_TYPES)
