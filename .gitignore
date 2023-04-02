@@ -1,0 +1,6 @@
+.idea
+lazygit.bat
+config.properties
+*.log
+*.log.*
+__pycache__
