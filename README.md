@@ -6,8 +6,7 @@ Telegram Downloader Bot
 
 + ```pip install python-telegram-bot --upgrade``` or ```pip install python-telegram-bot -U --pre```
 + ```pip install python-telegram-bot[rate-limiter]```
-+ ```pip install gtts```
-+ ```pip install pytz```
++ ```pip install validators```
 + Create the ```config.properties``` file in the project's directory, and put this content:
 
 ```
@@ -31,6 +30,7 @@ http.version=1.1
 
 ```
 version - show bot's version
+download - download a video from an url
 ```
 
 ## BotFather creation's infos

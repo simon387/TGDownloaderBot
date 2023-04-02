@@ -7,9 +7,10 @@ import time as time_os
 import traceback
 from logging.handlers import RotatingFileHandler
 
-from telegram import Update
+import validators
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.constants import ParseMode
-from telegram.ext import ApplicationBuilder, CallbackContext, CommandHandler, ContextTypes, Application, AIORateLimiter
+from telegram.ext import ApplicationBuilder, CallbackContext, CommandHandler, ContextTypes, Application, AIORateLimiter, filters, MessageHandler
 
 import constants as c
 from BotApp import BotApp
@@ -31,6 +32,11 @@ log.basicConfig(
 async def send_version(update: Update, context: CallbackContext):
 	log_bot_event(update, 'send_version')
 	await context.bot.send_message(chat_id=update.effective_chat.id, text=get_version() + c.VERSION_MESSAGE)
+
+
+async def unknown_command(update: Update, context: CallbackContext):
+	log_bot_event(update, 'unknown_command')
+	await context.bot.send_message(chat_id=update.effective_chat.id, text=c.ERROR_UNKNOWN_COMMAND_MESSAGE)
 
 
 async def post_init(app: Application):
@@ -87,6 +93,28 @@ def get_version():
 	return firstline
 
 
+async def download(update: Update, context: CallbackContext):
+	log_bot_event(update, 'download')
+
+	message = c.SPACE.join(context.args).strip()
+	if validators.url(message):
+		if "https://www.youtube." in message and "/watch?" in message:
+
+			keyboard = [
+				[
+					InlineKeyboardButton("Download mp3", callback_data='callback_1'),
+					InlineKeyboardButton("Download Video", callback_data='callback_2'),
+				]
+			]
+			reply_markup = InlineKeyboardMarkup(keyboard)
+
+			await context.bot.send_message(chat_id=update.effective_chat.id, text="hai inserito un url di youtube", reply_markup=reply_markup)
+		else:
+			await context.bot.send_message(chat_id=update.effective_chat.id, text="hai inserito un url non di youtube")
+	else:
+		await context.bot.send_message(chat_id=update.effective_chat.id, text="Non hai inserito un url valido")
+
+
 if __name__ == '__main__':
 	application = ApplicationBuilder() \
 		.token(c.TOKEN) \
@@ -98,6 +126,7 @@ if __name__ == '__main__':
 		.get_updates_http_version(c.HTTP_VERSION) \
 		.build()
 	application.add_handler(CommandHandler('version', send_version))
-	# application.add_handler(MessageHandler(filters.COMMAND, unknown_command))
+	application.add_handler(CommandHandler('download', download))
+	application.add_handler(MessageHandler(filters.COMMAND, unknown_command))
 	application.add_error_handler(error_handler)
 	application.run_polling(allowed_updates=Update.ALL_TYPES)

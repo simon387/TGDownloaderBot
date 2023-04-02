@@ -29,4 +29,5 @@ VERSION_MESSAGE = " - more info on https://github.com/simon387/TGDownloaderBot/b
 ERROR_UNKNOWN_COMMAND_MESSAGE = "This command doesn't exist!"
 # urls
 
-#
+# var
+SPACE = " "
