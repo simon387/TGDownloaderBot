@@ -6,7 +6,7 @@ import sys
 import time as time_os
 import traceback
 from logging.handlers import RotatingFileHandler
-
+import subprocess
 import validators
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.constants import ParseMode
@@ -107,7 +107,7 @@ async def download(update: Update, context: CallbackContext):
 				]
 			]
 			reply_markup = InlineKeyboardMarkup(keyboard)
-			await context.bot.send_message(chat_id=update.effective_chat.id, text="Hai inserito un url di youtube", reply_markup=reply_markup)
+			await context.bot.send_message(chat_id=update.effective_chat.id, text="Hai inserito un url di youtube valido! Cosa ne vuoi fare?", reply_markup=reply_markup)
 		else:
 			await context.bot.send_message(chat_id=update.effective_chat.id, text="Hai inserito un url non di youtube")
 	else:
@@ -116,11 +116,18 @@ async def download(update: Update, context: CallbackContext):
 
 async def keyboard_callback(update: Update, context: CallbackContext):
 	query = update.callback_query
-	prefix = query[0:3]
-	url = query[3:]
+	prefix = query.data[0:3]
+	url = query.data[3:]
+	await query.answer(f'selected: download from {url}')
 
-	print('query.data:', query.data)
-	await query.answer(f'selected: {query.data}')
+	if prefix == 'MP3':
+		result = subprocess.run(["youtube-dl", "-x", "--audio-format", "MP3", url], capture_output=True, text=True)
+		print("The exit code was: %d" % result.returncode)
+		print("stdout:", result.stdout)
+		print("stderr:", result.stderr)
+	else:
+		print("ciao")
+
 	await context.bot.send_message(chat_id=update.effective_chat.id, text="ciao")
 
 
