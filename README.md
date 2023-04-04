@@ -18,7 +18,7 @@ telegram.developer.chat.id=WWW
 # log.level = info | debug | error
 log.level=info
 send.start.and.stop.message=false
-# 1.1 | 2.0
+# 1.1 | 2
 http.version=1.1
 ```
 

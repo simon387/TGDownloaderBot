@@ -6,3 +6,5 @@ config.properties
 __pycache__
 *.webm
 *.mp3
+*.part
+*.mp4

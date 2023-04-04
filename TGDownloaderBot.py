@@ -103,8 +103,8 @@ async def download(update: Update, context: CallbackContext):
 		if "https://www.youtube." in message and "/watch?" in message:
 			keyboard = [
 				[
-					InlineKeyboardButton("Download mp3", callback_data='MP3' + message),
-					InlineKeyboardButton("Download Video", callback_data='MP4' + message),
+					InlineKeyboardButton("Download mp3", callback_data=c.MP3 + message),
+					InlineKeyboardButton("Download Video", callback_data=c.MP4 + message),
 				]
 			]
 			reply_markup = InlineKeyboardMarkup(keyboard)
@@ -121,22 +121,25 @@ async def keyboard_callback(update: Update, context: CallbackContext):
 	url = query.data[3:]
 	await query.answer(f'selected: download from {url}')
 
-	if prefix == 'MP3':
+	if prefix == c.MP3:
 		result = subprocess.run(["yt-dlp.exe", "-x", "--restrict-filenames", "--audio-format", "mp3", url], capture_output=True, text=True)
-		log.info("The exit code was: " + str(result.returncode))
-		log.info("stdout: " + result.stdout)
-		log.info("stderr: " + result.stderr)
-		file_name = get_file_name(result.stdout)
-		if file_name != '':
+	else:
+		result = subprocess.run(["yt-dlp.exe", "--format", "mp4", "--restrict-filenames", url], capture_output=True, text=True)
+	log.info("The exit code was: " + str(result.returncode))
+	log.info("stdout: " + result.stdout)
+	log.info("stderr: " + result.stderr)
+	file_name = get_file_name(result.stdout, prefix)
+	if file_name != '':
+		if prefix == c.MP3:
 			await context.bot.send_audio(chat_id=update.effective_chat.id, audio=file_name)
 		else:
-			await context.bot.send_message(chat_id=update.effective_chat.id, text="Error on downloading stuffs!")
+			await context.bot.send_video(chat_id=update.effective_chat.id, video=file_name)
 	else:
-		await context.bot.send_message(chat_id=update.effective_chat.id, text="Ancora non posso scaricare video!")
+		await context.bot.send_message(chat_id=update.effective_chat.id, text="Error on downloading stuffs!")
 
 
-def get_file_name(test_str):
-	regex = r"\S+\.mp3"
+def get_file_name(test_str, format_name):
+	regex = r"\S+\." + format_name.lower()
 	matches = re.finditer(regex, test_str, re.MULTILINE)
 	for matchNum, match in enumerate(matches, start=1):
 		return match.group()

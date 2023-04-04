@@ -27,8 +27,11 @@ STARTUP_MESSAGE = "TGDownloaderBot started! "
 STOP_MESSAGE = "TGDownloaderBot stopped!"
 VERSION_MESSAGE = " - more info on https://github.com/simon387/TGDownloaderBot/blob/master/changelog.txt"
 ERROR_UNKNOWN_COMMAND_MESSAGE = "This command doesn't exist!"
-YT_OK_MESSAGE = "Hai inserito un url di youtube valido! Cosa ne vuoi fare?"
+YT_OK_MESSAGE = "This is a valid youtube link! What do you want to do?"
 # urls
 
 # var
 SPACE = " "
+MP3 = "MP3"
+MP4 = "MP4"
+RB = "rb"
