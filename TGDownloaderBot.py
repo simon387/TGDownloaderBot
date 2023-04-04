@@ -2,11 +2,13 @@ import html
 import json
 import logging as log
 import os
+import re
+import subprocess
 import sys
 import time as time_os
 import traceback
 from logging.handlers import RotatingFileHandler
-import subprocess
+
 import validators
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.constants import ParseMode
@@ -96,7 +98,6 @@ def get_version():
 
 async def download(update: Update, context: CallbackContext):
 	log_bot_event(update, 'download')
-
 	message = c.SPACE.join(context.args).strip()
 	if validators.url(message):
 		if "https://www.youtube." in message and "/watch?" in message:
@@ -107,11 +108,11 @@ async def download(update: Update, context: CallbackContext):
 				]
 			]
 			reply_markup = InlineKeyboardMarkup(keyboard)
-			await context.bot.send_message(chat_id=update.effective_chat.id, text="Hai inserito un url di youtube valido! Cosa ne vuoi fare?", reply_markup=reply_markup)
+			await context.bot.send_message(chat_id=update.effective_chat.id, text=c.YT_OK_MESSAGE, reply_markup=reply_markup)
 		else:
-			await context.bot.send_message(chat_id=update.effective_chat.id, text="Hai inserito un url non di youtube")
+			await context.bot.send_message(chat_id=update.effective_chat.id, text="I can't download this!")
 	else:
-		await context.bot.send_message(chat_id=update.effective_chat.id, text="Non hai inserito un url valido")
+		await context.bot.send_message(chat_id=update.effective_chat.id, text="This is not a valid url!")
 
 
 async def keyboard_callback(update: Update, context: CallbackContext):
@@ -121,14 +122,25 @@ async def keyboard_callback(update: Update, context: CallbackContext):
 	await query.answer(f'selected: download from {url}')
 
 	if prefix == 'MP3':
-		result = subprocess.run(["youtube-dl", "-x", "--audio-format", "MP3", url], capture_output=True, text=True)
-		print("The exit code was: %d" % result.returncode)
-		print("stdout:", result.stdout)
-		print("stderr:", result.stderr)
+		result = subprocess.run(["yt-dlp.exe", "-x", "--restrict-filenames", "--audio-format", "mp3", url], capture_output=True, text=True)
+		log.info("The exit code was: " + str(result.returncode))
+		log.info("stdout: " + result.stdout)
+		log.info("stderr: " + result.stderr)
+		file_name = get_file_name(result.stdout)
+		if file_name != '':
+			await context.bot.send_audio(chat_id=update.effective_chat.id, audio=file_name)
+		else:
+			await context.bot.send_message(chat_id=update.effective_chat.id, text="Error on downloading stuffs!")
 	else:
-		print("ciao")
+		await context.bot.send_message(chat_id=update.effective_chat.id, text="Ancora non posso scaricare video!")
 
-	await context.bot.send_message(chat_id=update.effective_chat.id, text="ciao")
+
+def get_file_name(test_str):
+	regex = r"\S+\.mp3"
+	matches = re.finditer(regex, test_str, re.MULTILINE)
+	for matchNum, match in enumerate(matches, start=1):
+		return match.group()
+	return ''
 
 
 if __name__ == '__main__':

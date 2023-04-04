@@ -52,3 +52,8 @@ For a description of the Bot API, see this page: https://core.telegram.org/bots/
 + download from instagram
 + download from tictok
 + download from facebook
+
+## Links
+
++ https://www.gyan.dev/ffmpeg/builds/
++ https://github.com/yt-dlp/yt-dlp/releases

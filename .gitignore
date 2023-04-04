@@ -4,3 +4,5 @@ config.properties
 *.log
 *.log.*
 __pycache__
+*.webm
+*.mp3
