@@ -28,10 +28,12 @@ STOP_MESSAGE = "TGDownloaderBot stopped!"
 VERSION_MESSAGE = " - more info on https://github.com/simon387/TGDownloaderBot/blob/master/changelog.txt"
 ERROR_UNKNOWN_COMMAND_MESSAGE = "This command doesn't exist!"
 YT_OK_MESSAGE = "This is a valid youtube link! What do you want to do?"
+ERROR_NO_GRANT_SHUTDOWN = "You can't shutdown the bot!"
 # urls
 
 # var
 SPACE = " "
+EMPTY = ""
 MP3 = "MP3"
 MP4 = "MP4"
-RB = "rb"
+TRUE = "true"

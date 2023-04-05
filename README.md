@@ -31,6 +31,7 @@ http.version=1.1
 ```
 version - show bot's version
 download - download a video from an url
+shutdown - shutdown the bot
 ```
 
 ## BotFather creation's infos

@@ -3,6 +3,7 @@ import json
 import logging as log
 import os
 import re
+import signal
 import subprocess
 import sys
 import time as time_os
@@ -35,6 +36,16 @@ log.basicConfig(
 async def send_version(update: Update, context: CallbackContext):
 	log_bot_event(update, 'send_version')
 	await context.bot.send_message(chat_id=update.effective_chat.id, text=get_version() + c.VERSION_MESSAGE)
+
+
+async def send_shutdown(update: Update, context: CallbackContext):
+	log_bot_event(update, 'send_shutdown')
+	if update.effective_user.id == int(c.TELEGRAM_DEVELOPER_CHAT_ID):
+		if c.SEND_START_AND_STOP_MESSAGE == c.TRUE:
+			await context.bot.send_message(chat_id=c.TELEGRAM_GROUP_ID, text=c.STOP_MESSAGE, parse_mode=ParseMode.HTML)
+		os.kill(os.getpid(), signal.SIGINT)
+	else:
+		await context.bot.send_message(chat_id=update.effective_chat.id, text=c.ERROR_NO_GRANT_SHUTDOWN)
 
 
 async def unknown_command(update: Update, context: CallbackContext):
@@ -129,7 +140,7 @@ async def keyboard_callback(update: Update, context: CallbackContext):
 	log.info("stdout: " + result.stdout)
 	log.info("stderr: " + result.stderr)
 	file_name = get_file_name(result.stdout, prefix)
-	if file_name != '':
+	if file_name != c.EMPTY:
 		if prefix == c.MP3:
 			await context.bot.send_audio(chat_id=update.effective_chat.id, audio=file_name)
 		else:
@@ -157,6 +168,7 @@ if __name__ == '__main__':
 		.get_updates_http_version(c.HTTP_VERSION) \
 		.build()
 	application.add_handler(CommandHandler('version', send_version))
+	application.add_handler(CommandHandler('shutdown', send_shutdown))
 	application.add_handler(CommandHandler('download', download))
 	application.add_handler(MessageHandler(filters.COMMAND, unknown_command))
 	application.add_handler(CallbackQueryHandler(keyboard_callback))
