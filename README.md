@@ -51,7 +51,7 @@ For a description of the Bot API, see this page: https://core.telegram.org/bots/
 
 + ~~download from youtube video/mp3~~
 + download from instagram
-+ download from tictok
++ download from tiktok
 + download from facebook
 
 ## Links
