@@ -47,9 +47,9 @@ Keep your token secure and store it safely, it can be used by anyone to control 
 
 For a description of the Bot API, see this page: https://core.telegram.org/bots/api
 
-## TODOs (maybe)
+## TODOs
 
-+ download from youtube video/mp3
++ ~~download from youtube video/mp3~~
 + download from instagram
 + download from tictok
 + download from facebook
