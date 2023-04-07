@@ -1,16 +1,17 @@
+import base64
 import html
 import json
 import logging as log
 import os
+import re
 import signal
-import subprocess
 import sys
 import time as time_os
 import traceback
 from logging.handlers import RotatingFileHandler
 
-import yt_dlp
 import validators
+import yt_dlp
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.constants import ParseMode
 from telegram.ext import ApplicationBuilder, CallbackContext, CommandHandler, ContextTypes, Application, AIORateLimiter, filters, MessageHandler, \
@@ -114,15 +115,21 @@ async def download(update: Update, context: CallbackContext):
 		if ("https://www.youtube." in msg and "/watch?" in msg) or \
 				"facebook.com/" in msg or \
 				"https://fb.watch/" in msg or \
-				"https://www.instagram.com/" in msg:
+				"https://www.instagram.com/" in msg or \
+				"https://www.tiktok.com/" in msg:
+			# clean
+			if "https://www.youtube." in msg and "/watch?" in msg:
+				msg = re.sub('&list=.+', '', msg)
+			#
 			keyboard = [
 				[
-					InlineKeyboardButton("Download mp3", callback_data=c.MP3 + msg),
-					InlineKeyboardButton("Download Video", callback_data=c.MP4 + msg),
+					InlineKeyboardButton("Download mp3", callback_data=c.MP3),
+					InlineKeyboardButton("Download Video", callback_data=c.MP4),
 				]
 			]
 			reply_markup = InlineKeyboardMarkup(keyboard)
-			await context.bot.send_message(chat_id=update.effective_chat.id, text=c.YT_OK_MESSAGE, reply_markup=reply_markup)
+			pre_text = '<a href="tg://btn/' + str(base64.urlsafe_b64encode(msg.encode('utf-8'))) + '">\u200b</a>'
+			await context.bot.send_message(chat_id=update.effective_chat.id, text=pre_text + c.YT_OK_MESSAGE, reply_markup=reply_markup, parse_mode='HTML')
 		else:
 			await context.bot.send_message(chat_id=update.effective_chat.id, text="I can't download this!")
 	else:
@@ -131,12 +138,11 @@ async def download(update: Update, context: CallbackContext):
 
 async def keyboard_callback(update: Update, context: CallbackContext):
 	query = update.callback_query
-	prefix = query.data[0:3]
-	url = query.data[3:]
-	url = 'https://www.instagram.com/reel/CpNg9-WoI4u/?igshid=YmMyMTA2M2Y='
+	mode = query.data
+	url = str(base64.urlsafe_b64decode(query.message.entities[0].url[11:]))[2:-1]
 	await query.answer(f'selected: download from {url}')
 
-	if prefix == c.MP3:
+	if mode == c.MP3:
 		ydl_opts = {
 			'format': 'm4a/bestaudio/best',
 			# ℹ️ See help(yt_dlp.postprocessor) for a list of available Postprocessors and their arguments
@@ -146,13 +152,19 @@ async def keyboard_callback(update: Update, context: CallbackContext):
 			}],
 			'restrictfilenames': True,
 		}
+	# 'format': 'bestaudio/best',
+	# 'postprocessors': [{
+	# 	'key': 'FFmpegExtractAudio',
+	# 	'preferredcodec': 'mp3',
+	# 	'preferredquality': '192',
+	# }],
 	else:
 		ydl_opts = {}
 	with yt_dlp.YoutubeDL(ydl_opts) as ydl:
 		info = ydl.extract_info(url, download=False)
 		file_path = ydl.prepare_filename(info)
 		ydl.process_info(info)
-	if prefix == c.MP3:
+	if mode == c.MP3:
 		await context.bot.send_audio(chat_id=update.effective_chat.id, audio=file_path)
 	else:
 		await context.bot.send_video(chat_id=update.effective_chat.id, video=file_path)
