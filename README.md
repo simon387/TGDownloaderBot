@@ -8,6 +8,7 @@ Telegram Downloader Bot
 + ```pip install python-telegram-bot[rate-limiter]```
 + ```pip install validators```
 + ```pip install -U yt-dlp```
++ ```sudo dnf install ffmpeg```
 + Create the ```config.properties``` file in the project's directory, and put this content:
 
 ```
