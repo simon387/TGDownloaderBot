@@ -27,7 +27,7 @@ STARTUP_MESSAGE = "TGDownloaderBot started! "
 STOP_MESSAGE = "TGDownloaderBot stopped!"
 VERSION_MESSAGE = " - more info on https://github.com/simon387/TGDownloaderBot/blob/master/changelog.txt"
 ERROR_UNKNOWN_COMMAND_MESSAGE = "This command doesn't exist!"
-YT_OK_MESSAGE = "This is a valid youtube link! What do you want to do?"
+YT_OK_MESSAGE = "This is a valid page link! What do you want to do?"
 ERROR_NO_GRANT_SHUTDOWN = "You can't shutdown the bot!"
 # urls
 

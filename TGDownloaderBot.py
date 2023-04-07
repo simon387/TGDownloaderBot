@@ -2,7 +2,6 @@ import html
 import json
 import logging as log
 import os
-import re
 import signal
 import subprocess
 import sys
@@ -10,6 +9,7 @@ import time as time_os
 import traceback
 from logging.handlers import RotatingFileHandler
 
+import yt_dlp
 import validators
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.constants import ParseMode
@@ -109,13 +109,16 @@ def get_version():
 
 async def download(update: Update, context: CallbackContext):
 	log_bot_event(update, 'download')
-	message = c.SPACE.join(context.args).strip()
-	if validators.url(message):
-		if "https://www.youtube." in message and "/watch?" in message:
+	msg = c.SPACE.join(context.args).strip()
+	if validators.url(msg):
+		if ("https://www.youtube." in msg and "/watch?" in msg) or \
+				"facebook.com/" in msg or \
+				"https://fb.watch/" in msg or \
+				"https://www.instagram.com/" in msg:
 			keyboard = [
 				[
-					InlineKeyboardButton("Download mp3", callback_data=c.MP3 + message),
-					InlineKeyboardButton("Download Video", callback_data=c.MP4 + message),
+					InlineKeyboardButton("Download mp3", callback_data=c.MP3 + msg),
+					InlineKeyboardButton("Download Video", callback_data=c.MP4 + msg),
 				]
 			]
 			reply_markup = InlineKeyboardMarkup(keyboard)
@@ -130,31 +133,29 @@ async def keyboard_callback(update: Update, context: CallbackContext):
 	query = update.callback_query
 	prefix = query.data[0:3]
 	url = query.data[3:]
+	url = 'https://www.instagram.com/reel/CpNg9-WoI4u/?igshid=YmMyMTA2M2Y='
 	await query.answer(f'selected: download from {url}')
 
 	if prefix == c.MP3:
-		result = subprocess.run(["yt-dlp.exe", "-x", "--restrict-filenames", "--audio-format", "mp3", url], capture_output=True, text=True)
+		ydl_opts = {
+			'format': 'm4a/bestaudio/best',
+			# ℹ️ See help(yt_dlp.postprocessor) for a list of available Postprocessors and their arguments
+			'postprocessors': [{  # Extract audio using ffmpeg
+				'key': 'FFmpegExtractAudio',
+				'preferredcodec': 'm4a',
+			}],
+			'restrictfilenames': True,
+		}
 	else:
-		result = subprocess.run(["yt-dlp.exe", "--format", "mp4", "--restrict-filenames", url], capture_output=True, text=True)
-	log.info("The exit code was: " + str(result.returncode))
-	log.info("stdout: " + result.stdout)
-	log.info("stderr: " + result.stderr)
-	file_name = get_file_name(result.stdout, prefix)
-	if file_name != c.EMPTY:
-		if prefix == c.MP3:
-			await context.bot.send_audio(chat_id=update.effective_chat.id, audio=file_name)
-		else:
-			await context.bot.send_video(chat_id=update.effective_chat.id, video=file_name)
+		ydl_opts = {}
+	with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+		info = ydl.extract_info(url, download=False)
+		file_path = ydl.prepare_filename(info)
+		ydl.process_info(info)
+	if prefix == c.MP3:
+		await context.bot.send_audio(chat_id=update.effective_chat.id, audio=file_path)
 	else:
-		await context.bot.send_message(chat_id=update.effective_chat.id, text="Error on downloading stuffs!")
-
-
-def get_file_name(test_str, format_name):
-	regex = r"\S+\." + format_name.lower()
-	matches = re.finditer(regex, test_str, re.MULTILINE)
-	for matchNum, match in enumerate(matches, start=1):
-		return match.group()
-	return ''
+		await context.bot.send_video(chat_id=update.effective_chat.id, video=file_path)
 
 
 if __name__ == '__main__':

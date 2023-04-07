@@ -7,6 +7,7 @@ Telegram Downloader Bot
 + ```pip install python-telegram-bot --upgrade``` or ```pip install python-telegram-bot -U --pre```
 + ```pip install python-telegram-bot[rate-limiter]```
 + ```pip install validators```
++ ```pip install -U yt-dlp```
 + Create the ```config.properties``` file in the project's directory, and put this content:
 
 ```
@@ -50,11 +51,11 @@ For a description of the Bot API, see this page: https://core.telegram.org/bots/
 ## TODOs
 
 + ~~download from youtube video/mp3~~
++ ~~download from facebook~~
 + download from instagram
 + download from tiktok
-+ download from facebook
 
 ## Links
 
 + https://www.gyan.dev/ffmpeg/builds/
-+ https://github.com/yt-dlp/yt-dlp/releases
++ https://github.com/yt-dlp/yt-dlp/
