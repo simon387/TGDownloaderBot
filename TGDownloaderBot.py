@@ -14,8 +14,7 @@ import validators
 import yt_dlp
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.constants import ParseMode
-from telegram.ext import ApplicationBuilder, CallbackContext, CommandHandler, ContextTypes, Application, AIORateLimiter, filters, MessageHandler, \
-	CallbackQueryHandler
+from telegram.ext import ApplicationBuilder, CallbackContext, CommandHandler, ContextTypes, Application, AIORateLimiter, CallbackQueryHandler
 
 import constants as c
 from BotApp import BotApp
@@ -47,11 +46,6 @@ async def send_shutdown(update: Update, context: CallbackContext):
 		os.kill(os.getpid(), signal.SIGINT)
 	else:
 		await context.bot.send_message(chat_id=update.effective_chat.id, text=c.ERROR_NO_GRANT_SHUTDOWN)
-
-
-async def unknown_command(update: Update, context: CallbackContext):
-	log_bot_event(update, 'unknown_command')
-	await context.bot.send_message(chat_id=update.effective_chat.id, text=c.ERROR_UNKNOWN_COMMAND_MESSAGE)
 
 
 async def post_init(app: Application):
@@ -183,7 +177,6 @@ if __name__ == '__main__':
 	application.add_handler(CommandHandler('version', send_version))
 	application.add_handler(CommandHandler('shutdown', send_shutdown))
 	application.add_handler(CommandHandler('download', download))
-	application.add_handler(MessageHandler(filters.COMMAND, unknown_command))
 	application.add_handler(CallbackQueryHandler(keyboard_callback))
 	application.add_error_handler(error_handler)
 	application.run_polling(allowed_updates=Update.ALL_TYPES)
