@@ -110,7 +110,8 @@ async def download(update: Update, context: CallbackContext):
 				"facebook.com/" in msg or \
 				"https://fb.watch/" in msg or \
 				"https://www.instagram.com/" in msg or \
-				"https://www.tiktok.com/" in msg:
+				"https://www.tiktok.com/" in msg or \
+				"https://vm.tiktok.com/" in msg:
 			# clean
 			if "https://www.youtube." in msg and "/watch?" in msg:
 				msg = re.sub('&list=.+', '', msg)
