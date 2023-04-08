@@ -123,12 +123,12 @@ async def download(update: Update, context: CallbackContext):
 				]
 			]
 			reply_markup = InlineKeyboardMarkup(keyboard)
-			pre_text = '<a href="tg://btn/' + str(base64.urlsafe_b64encode(msg.encode('utf-8'))) + '">\u200b</a>'
-			await context.bot.send_message(chat_id=update.effective_chat.id, text=pre_text + c.YT_OK_MESSAGE, reply_markup=reply_markup, parse_mode='HTML')
+			text = '<a href="tg://btn/' + str(base64.urlsafe_b64encode(msg.encode('utf-8'))) + '">\u200b</a>' + c.VALID_LINK_MESSAGE
+			await context.bot.send_message(chat_id=update.effective_chat.id, text=text, reply_markup=reply_markup, parse_mode='HTML')
 		else:
-			await context.bot.send_message(chat_id=update.effective_chat.id, text="I can't download this!")
+			await context.bot.send_message(chat_id=update.effective_chat.id, text=c.ERROR_CANT_DOWNLOAD)
 	else:
-		await context.bot.send_message(chat_id=update.effective_chat.id, text="This is not a valid url!")
+		await context.bot.send_message(chat_id=update.effective_chat.id, text=c.ERROR_NOT_VALID_URL)
 
 
 async def keyboard_callback(update: Update, context: CallbackContext):
@@ -158,10 +158,13 @@ async def keyboard_callback(update: Update, context: CallbackContext):
 	with yt_dlp.YoutubeDL(ydl_opts) as ydl:
 		info = ydl.extract_info(url, download=False)
 		file_path = ydl.prepare_filename(info)
+		log.info("Downloaded file into " + file_path)
 		ydl.process_info(info)
 	if mode == c.MP3:
+		log.info("Sending audio file" + file_path)
 		await context.bot.send_audio(chat_id=update.effective_chat.id, audio=file_path)
 	else:
+		log.info("Sending video file" + file_path)
 		await context.bot.send_video(chat_id=update.effective_chat.id, video=file_path)
 
 

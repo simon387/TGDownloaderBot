@@ -26,8 +26,10 @@ else:
 STARTUP_MESSAGE = "TGDownloaderBot started! "
 STOP_MESSAGE = "TGDownloaderBot stopped!"
 VERSION_MESSAGE = " - more info on https://github.com/simon387/TGDownloaderBot/blob/master/changelog.txt"
-YT_OK_MESSAGE = "This is a valid page link! What do you want to do?"
+VALID_LINK_MESSAGE = "This is a valid page link! What do you want to do?"
 ERROR_NO_GRANT_SHUTDOWN = "You can't shutdown the bot!"
+ERROR_CANT_DOWNLOAD = "I can't download this!"
+ERROR_NOT_VALID_URL = "This is not a valid url!"
 # urls
 
 # var
