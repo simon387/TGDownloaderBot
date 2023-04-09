@@ -118,7 +118,7 @@ async def download(update: Update, context: CallbackContext):
 			#
 			keyboard = [
 				[
-					InlineKeyboardButton("Download mp3", callback_data=c.MP3),
+					InlineKeyboardButton("Download Audio", callback_data=c.MP3),
 					InlineKeyboardButton("Download Video", callback_data=c.MP4),
 				]
 			]
@@ -136,7 +136,6 @@ async def keyboard_callback(update: Update, context: CallbackContext):
 	mode = query.data
 	url = str(base64.urlsafe_b64decode(query.message.entities[0].url[11:]))[2:-1]
 	await query.answer(f'selected: download from {url}')
-
 	if mode == c.MP3:
 		ydl_opts = {
 			'format': 'm4a/bestaudio/best',
@@ -147,12 +146,6 @@ async def keyboard_callback(update: Update, context: CallbackContext):
 			}],
 			'restrictfilenames': True,
 		}
-	# 'format': 'bestaudio/best',
-	# 'postprocessors': [{
-	# 	'key': 'FFmpegExtractAudio',
-	# 	'preferredcodec': 'mp3',
-	# 	'preferredquality': '192',
-	# }],
 	else:
 		ydl_opts = {}
 	with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -161,6 +154,7 @@ async def keyboard_callback(update: Update, context: CallbackContext):
 		log.info("Downloaded file into " + file_path)
 		ydl.process_info(info)
 	if mode == c.MP3:
+		file_path = file_path[:-4] + '.m4a'
 		log.info("Sending audio file" + file_path)
 		await context.bot.send_audio(chat_id=update.effective_chat.id, audio=file_path)
 	else:
