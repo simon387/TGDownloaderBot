@@ -14,7 +14,8 @@ import validators
 import yt_dlp
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.constants import ParseMode
-from telegram.ext import ApplicationBuilder, CallbackContext, CommandHandler, ContextTypes, Application, AIORateLimiter, CallbackQueryHandler
+from telegram.ext import ApplicationBuilder, CallbackContext, CommandHandler, ContextTypes, Application, AIORateLimiter, CallbackQueryHandler, MessageHandler, \
+	filters
 
 import constants as c
 from BotApp import BotApp
@@ -102,16 +103,19 @@ def get_version():
 	return firstline
 
 
-async def download(update: Update, context: CallbackContext):
+async def chat_check(update: Update, context: CallbackContext):
+	log_bot_event(update, 'chat_check')
+	msg = update.message.text
+	if validators.url(msg) and validate(msg):
+		await download(update, context, False, msg)
+
+
+async def download(update: Update, context: CallbackContext, answer_with_error=True, msg=''):
 	log_bot_event(update, 'download')
-	msg = c.SPACE.join(context.args).strip()
+	if msg == '':
+		msg = c.SPACE.join(context.args).strip()
 	if validators.url(msg):
-		if ("https://www.youtube." in msg and "/watch?" in msg) or \
-				"facebook.com/" in msg or \
-				"https://fb.watch/" in msg or \
-				"https://www.instagram.com/" in msg or \
-				"https://www.tiktok.com/" in msg or \
-				"https://vm.tiktok.com/" in msg:
+		if validate(msg):
 			# clean
 			if "https://www.youtube." in msg and "/watch?" in msg:
 				msg = re.sub('&list=.+', '', msg)
@@ -126,9 +130,21 @@ async def download(update: Update, context: CallbackContext):
 			text = '<a href="tg://btn/' + str(base64.urlsafe_b64encode(msg.encode('utf-8'))) + '">\u200b</a>' + c.VALID_LINK_MESSAGE
 			await context.bot.send_message(chat_id=update.effective_chat.id, text=text, reply_markup=reply_markup, parse_mode='HTML')
 		else:
-			await context.bot.send_message(chat_id=update.effective_chat.id, text=c.ERROR_CANT_DOWNLOAD)
+			if answer_with_error:
+				await context.bot.send_message(chat_id=update.effective_chat.id, text=c.ERROR_CANT_DOWNLOAD)
 	else:
-		await context.bot.send_message(chat_id=update.effective_chat.id, text=c.ERROR_NOT_VALID_URL)
+		if answer_with_error:
+			await context.bot.send_message(chat_id=update.effective_chat.id, text=c.ERROR_NOT_VALID_URL)
+
+
+def validate(msg):
+	return ("https://www.youtube." in msg and "/watch?" in msg) or \
+		"https://www.youtube.com/shorts/" in msg or \
+		"facebook.com/" in msg or \
+		"https://fb.watch/" in msg or \
+		"https://www.instagram.com/" in msg or \
+		"https://www.tiktok.com/" in msg or \
+		"https://vm.tiktok.com/" in msg
 
 
 async def keyboard_callback(update: Update, context: CallbackContext):
@@ -176,5 +192,6 @@ if __name__ == '__main__':
 	application.add_handler(CommandHandler('shutdown', send_shutdown))
 	application.add_handler(CommandHandler('download', download))
 	application.add_handler(CallbackQueryHandler(keyboard_callback))
+	application.add_handler(MessageHandler(filters.TEXT, chat_check))
 	application.add_error_handler(error_handler)
 	application.run_polling(allowed_updates=Update.ALL_TYPES)
