@@ -102,8 +102,8 @@ def get_version():
 
 
 async def chat_check(update: Update, context: CallbackContext):
-	log_bot_event(update, 'chat_check')
 	if hasattr(update.message, 'text'):
+		log_bot_event(update, 'chat_check')
 		msg = update.message.text
 		if validators.url(msg) and validate(msg):
 			await download(update, context, False, msg)
