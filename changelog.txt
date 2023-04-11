@@ -1,1 +1,5 @@
+Version 1.0.1
+- fix bug shutdown
+- fix bug empty messages
+
 Version 1.0.0
