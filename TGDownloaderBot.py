@@ -152,6 +152,9 @@ async def keyboard_callback(update: Update, context: CallbackContext):
 	mode = query.data
 	url = str(base64.urlsafe_b64decode(query.message.entities[0].url[11:]))[2:-1]
 	await query.answer(f'selected: download from {url}')
+	paths = {
+		'home': 'download'
+	}
 	if mode == c.MP3:
 		ydl_opts = {
 			'format': 'm4a/bestaudio/best',
@@ -161,9 +164,12 @@ async def keyboard_callback(update: Update, context: CallbackContext):
 				'preferredcodec': 'm4a',
 			}],
 			'restrictfilenames': True,
+			'paths': paths,
 		}
 	else:
-		ydl_opts = {}
+		ydl_opts = {
+			'paths': paths,
+		}
 	with yt_dlp.YoutubeDL(ydl_opts) as ydl:
 		info = ydl.extract_info(url, download=False)
 		file_path = ydl.prepare_filename(info)
