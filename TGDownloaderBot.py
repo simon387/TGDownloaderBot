@@ -23,7 +23,7 @@ from BotApp import BotApp
 log.basicConfig(
 	handlers=[
 		RotatingFileHandler(
-			'TGDownloaderBot.log',
+			'_TGDownloaderBot.log',
 			maxBytes=10240000,
 			backupCount=5
 		),
@@ -49,21 +49,21 @@ async def send_shutdown(update: Update, context: CallbackContext):
 
 async def post_init(app: Application):
 	version = get_version()
-	log.info("Starting TGDownloaderBot, " + version)
+	log.info(f"Starting TGDownloaderBot, {version}")
 	if c.SEND_START_AND_STOP_MESSAGE == 'true':
 		await app.bot.send_message(chat_id=c.TELEGRAM_GROUP_ID, text=c.STARTUP_MESSAGE + version, parse_mode=ParseMode.HTML)
 		await app.bot.send_message(chat_id=c.TELEGRAM_DEVELOPER_CHAT_ID, text=c.STARTUP_MESSAGE + version, parse_mode=ParseMode.HTML)
 
 
 async def post_shutdown(app: Application):
-	log.info("Shutting down, bot id=" + str(app.bot.id))
+	log.info(f"Shutting down, bot id={str(app.bot.id)}")
 
 
 def log_bot_event(update: Update, method_name: str):
 	msg = update.message.text
 	user = update.effective_user.first_name
 	uid = update.effective_user.id
-	log.info("[method=" + method_name + '] Got this message from ' + user + "[id=" + str(uid) + "]" + ": " + msg)
+	log.info(f"[method={method_name}] Got this message from {user} [id={str(uid)}]: {msg}")
 
 
 # Log the error and send a telegram message to notify the developer. Attemp to restart the bot too
@@ -126,7 +126,7 @@ async def download(update: Update, context: CallbackContext, answer_with_error=T
 				]
 			]
 			reply_markup = InlineKeyboardMarkup(keyboard)
-			text = '<a href="tg://btn/' + str(base64.urlsafe_b64encode(msg.encode('utf-8'))) + '">\u200b</a>' + c.VALID_LINK_MESSAGE
+			text = f'<a href="tg://btn/{str(base64.urlsafe_b64encode(msg.encode(c.UTF8)))}">\u200b</a>{c.VALID_LINK_MESSAGE}'
 			await context.bot.send_message(chat_id=update.effective_chat.id, text=text, reply_markup=reply_markup, parse_mode='HTML')
 		else:
 			if answer_with_error:
@@ -167,14 +167,14 @@ async def keyboard_callback(update: Update, context: CallbackContext):
 	with yt_dlp.YoutubeDL(ydl_opts) as ydl:
 		info = ydl.extract_info(url, download=False)
 		file_path = ydl.prepare_filename(info)
-		log.info("Downloaded file into " + file_path)
+		log.info(f"Downloaded file into {file_path}")
 		ydl.process_info(info)
 	if mode == c.MP3:
-		file_path = file_path[:-4] + '.m4a'
-		log.info("Sending audio file" + file_path)
+		file_path = f'{file_path[:-4]}.m4a'
+		log.info(f"Sending audio file: {file_path}")
 		await context.bot.send_audio(chat_id=update.effective_chat.id, audio=file_path)
 	else:
-		log.info("Sending video file" + file_path)
+		log.info(f"Sending video file: {file_path}")
 		await context.bot.send_video(chat_id=update.effective_chat.id, video=file_path)
 
 
