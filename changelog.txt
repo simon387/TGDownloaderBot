@@ -1,3 +1,6 @@
+Version 1.0.7
+- refactor constants file name1.
+
 Version 1.0.6
 - changed download default directory
 

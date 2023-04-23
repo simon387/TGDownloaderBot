@@ -17,7 +17,7 @@ from telegram.constants import ParseMode
 from telegram.ext import ApplicationBuilder, CallbackContext, CommandHandler, ContextTypes, Application, AIORateLimiter, CallbackQueryHandler, MessageHandler, \
 	filters
 
-import constants as c
+import Constants
 from BotApp import BotApp
 
 log.basicConfig(
@@ -30,29 +30,29 @@ log.basicConfig(
 		log.StreamHandler()
 	],
 	format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-	level=c.LOG_LEVEL
+	level=Constants.LOG_LEVEL
 )
 
 
 async def send_version(update: Update, context: CallbackContext):
 	log_bot_event(update, 'send_version')
-	await context.bot.send_message(chat_id=update.effective_chat.id, text=get_version() + c.VERSION_MESSAGE)
+	await context.bot.send_message(chat_id=update.effective_chat.id, text=get_version() + Constants.VERSION_MESSAGE)
 
 
 async def send_shutdown(update: Update, context: CallbackContext):
 	log_bot_event(update, 'send_shutdown')
-	if update.effective_user.id == int(c.TELEGRAM_DEVELOPER_CHAT_ID):
+	if update.effective_user.id == int(Constants.TELEGRAM_DEVELOPER_CHAT_ID):
 		os.kill(os.getpid(), signal.SIGINT)
 	else:
-		await context.bot.send_message(chat_id=update.effective_chat.id, text=c.ERROR_NO_GRANT_SHUTDOWN)
+		await context.bot.send_message(chat_id=update.effective_chat.id, text=Constants.ERROR_NO_GRANT_SHUTDOWN)
 
 
 async def post_init(app: Application):
 	version = get_version()
 	log.info(f"Starting TGDownloaderBot, {version}")
-	if c.SEND_START_AND_STOP_MESSAGE == 'true':
-		await app.bot.send_message(chat_id=c.TELEGRAM_GROUP_ID, text=c.STARTUP_MESSAGE + version, parse_mode=ParseMode.HTML)
-		await app.bot.send_message(chat_id=c.TELEGRAM_DEVELOPER_CHAT_ID, text=c.STARTUP_MESSAGE + version, parse_mode=ParseMode.HTML)
+	if Constants.SEND_START_AND_STOP_MESSAGE == 'true':
+		await app.bot.send_message(chat_id=Constants.TELEGRAM_GROUP_ID, text=Constants.STARTUP_MESSAGE + version, parse_mode=ParseMode.HTML)
+		await app.bot.send_message(chat_id=Constants.TELEGRAM_DEVELOPER_CHAT_ID, text=Constants.STARTUP_MESSAGE + version, parse_mode=ParseMode.HTML)
 
 
 async def post_shutdown(app: Application):
@@ -89,7 +89,7 @@ async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> N
 	if message.count('</pre>') % 2 != 0:
 		message += '</pre>'
 	# Finally, send the message
-	await context.bot.send_message(chat_id=c.TELEGRAM_DEVELOPER_CHAT_ID, text=message, parse_mode=ParseMode.HTML)
+	await context.bot.send_message(chat_id=Constants.TELEGRAM_DEVELOPER_CHAT_ID, text=message, parse_mode=ParseMode.HTML)
 	# Restart the bot
 	time_os.sleep(5.0)
 	os.execl(sys.executable, sys.executable, *sys.argv)
@@ -112,7 +112,7 @@ async def chat_check(update: Update, context: CallbackContext):
 async def download(update: Update, context: CallbackContext, answer_with_error=True, msg=''):
 	log_bot_event(update, 'download')
 	if msg == '':
-		msg = c.SPACE.join(context.args).strip()
+		msg = Constants.SPACE.join(context.args).strip()
 	if validators.url(msg):
 		if validate(msg):
 			# clean
@@ -121,19 +121,19 @@ async def download(update: Update, context: CallbackContext, answer_with_error=T
 			#
 			keyboard = [
 				[
-					InlineKeyboardButton("Download Audio", callback_data=c.MP3),
-					InlineKeyboardButton("Download Video", callback_data=c.MP4),
+					InlineKeyboardButton("Download Audio", callback_data=Constants.MP3),
+					InlineKeyboardButton("Download Video", callback_data=Constants.MP4),
 				]
 			]
 			reply_markup = InlineKeyboardMarkup(keyboard)
-			text = f'<a href="tg://btn/{str(base64.urlsafe_b64encode(msg.encode(c.UTF8)))}">\u200b</a>{c.VALID_LINK_MESSAGE}'
+			text = f'<a href="tg://btn/{str(base64.urlsafe_b64encode(msg.encode(Constants.UTF8)))}">\u200b</a>{Constants.VALID_LINK_MESSAGE}'
 			await context.bot.send_message(chat_id=update.effective_chat.id, text=text, reply_markup=reply_markup, parse_mode='HTML')
 		else:
 			if answer_with_error:
-				await context.bot.send_message(chat_id=update.effective_chat.id, text=c.ERROR_CANT_DOWNLOAD)
+				await context.bot.send_message(chat_id=update.effective_chat.id, text=Constants.ERROR_CANT_DOWNLOAD)
 	else:
 		if answer_with_error:
-			await context.bot.send_message(chat_id=update.effective_chat.id, text=c.ERROR_NOT_VALID_URL)
+			await context.bot.send_message(chat_id=update.effective_chat.id, text=Constants.ERROR_NOT_VALID_URL)
 
 
 def validate(msg):
@@ -155,7 +155,7 @@ async def keyboard_callback(update: Update, context: CallbackContext):
 	paths = {
 		'home': 'download'
 	}
-	if mode == c.MP3:
+	if mode == Constants.MP3:
 		ydl_opts = {
 			'format': 'm4a/bestaudio/best',
 			# ℹ️ See help(yt_dlp.postprocessor) for a list of available Postprocessors and their arguments
@@ -175,7 +175,7 @@ async def keyboard_callback(update: Update, context: CallbackContext):
 		file_path = ydl.prepare_filename(info)
 		log.info(f"Downloaded file into {file_path}")
 		ydl.process_info(info)
-	if mode == c.MP3:
+	if mode == Constants.MP3:
 		file_path = f'{file_path[:-4]}.m4a'
 		log.info(f"Sending audio file: {file_path}")
 		await context.bot.send_audio(chat_id=update.effective_chat.id, audio=file_path)
@@ -186,13 +186,13 @@ async def keyboard_callback(update: Update, context: CallbackContext):
 
 if __name__ == '__main__':
 	application = ApplicationBuilder() \
-		.token(c.TOKEN) \
+		.token(Constants.TOKEN) \
 		.application_class(BotApp) \
 		.post_init(post_init) \
 		.post_shutdown(post_shutdown) \
-		.rate_limiter(AIORateLimiter(max_retries=c.AIO_RATE_LIMITER_MAX_RETRIES)) \
-		.http_version(c.HTTP_VERSION) \
-		.get_updates_http_version(c.HTTP_VERSION) \
+		.rate_limiter(AIORateLimiter(max_retries=Constants.AIO_RATE_LIMITER_MAX_RETRIES)) \
+		.http_version(Constants.HTTP_VERSION) \
+		.get_updates_http_version(Constants.HTTP_VERSION) \
 		.build()
 	application.add_handler(CommandHandler('version', send_version))
 	application.add_handler(CommandHandler('shutdown', send_shutdown))
