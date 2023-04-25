@@ -140,6 +140,7 @@ def validate(msg):
 	return ("https://www.youtube." in msg and "/watch?" in msg) or \
 		"https://www.youtube.com/shorts/" in msg or \
 		"https://youtube.com/shorts/" in msg or \
+		"https://youtu.be/" in msg or \
 		"facebook.com/" in msg or \
 		"https://fb.watch/" in msg or \
 		"https://www.instagram.com/" in msg or \
