@@ -166,10 +166,14 @@ async def keyboard_callback(update: Update, context: CallbackContext):
 			}],
 			'restrictfilenames': True,
 			'paths': paths,
+			'trim_file_name': 16,
+			'windowsfilenames': True,
 		}
 	else:
 		ydl_opts = {
 			'paths': paths,
+			'trim_file_name': 16,
+			'windowsfilenames': True,
 		}
 	with yt_dlp.YoutubeDL(ydl_opts) as ydl:
 		info = ydl.extract_info(url, download=False)
