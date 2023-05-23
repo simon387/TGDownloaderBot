@@ -55,7 +55,7 @@ For a description of the Bot API, see this page: https://core.telegram.org/bots/
 + ~~download from facebook~~
 + ~~download from instagram~~
 + ~~download from tiktok~~
-+ https://youtube.com/shorts/rb4LEDH9EB8?feature=share timeout (custom ftp)
++ ~~https://youtube.com/shorts/rb4LEDH9EB8?feature=share timeout (custom ftp)~~
 + https://fb.watch/kafb9dYydS/ fb login https://github.com/yt-dlp/yt-dlp/issues/2140
 
 ## Links
