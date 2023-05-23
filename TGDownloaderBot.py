@@ -1,4 +1,5 @@
 import base64
+import ftplib
 import html
 import json
 import logging as log
@@ -14,6 +15,7 @@ import validators
 import yt_dlp
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.constants import ParseMode
+from telegram.error import TelegramError
 from telegram.ext import ApplicationBuilder, CallbackContext, CommandHandler, ContextTypes, Application, AIORateLimiter, CallbackQueryHandler, MessageHandler, \
 	filters
 
@@ -186,7 +188,29 @@ async def keyboard_callback(update: Update, context: CallbackContext):
 		await context.bot.send_audio(chat_id=update.effective_chat.id, audio=file_path)
 	else:
 		log.info(f"Sending video file: {file_path}")
-		await context.bot.send_video(chat_id=update.effective_chat.id, video=file_path)
+		try:
+			await context.bot.send_video(chat_id=update.effective_chat.id, video=file_path)
+		except TelegramError:
+			await upload_file_ftp(update, context, file_path)
+
+
+async def upload_file_ftp(update: Update, context: CallbackContext, local_file_path):
+	await context.bot.send_message(chat_id=update.effective_chat.id, text=Constants.FTP_MESSAGE_START)
+	ftp = ''
+	try:
+		ftp = ftplib.FTP(Constants.FTP_HOST)
+		ftp.login(Constants.FTP_USER, Constants.FTP_PASS)
+		ftp.cwd(Constants.FTP_REMOTE_FOLDER)
+		with open(local_file_path, 'rb') as file:
+			remote_file = re.sub(r"\s+", "_", local_file_path.replace('download\\', '').replace('download/', ''))
+			ftp.storbinary('STOR ' + remote_file, file)
+		log.info('Upload ok')
+		await context.bot.send_message(chat_id=update.effective_chat.id, text=Constants.FTP_MESSAGE_OK + Constants.FTP_URL + remote_file)
+	except ftplib.all_errors as e:
+		log.info('Upload ko:', str(e))
+		await context.bot.send_message(chat_id=update.effective_chat.id, text=Constants.ERROR_UPLOAD + str(e))
+	finally:
+		ftp.quit()
 
 
 if __name__ == '__main__':
