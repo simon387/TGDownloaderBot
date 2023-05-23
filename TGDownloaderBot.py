@@ -185,7 +185,10 @@ async def keyboard_callback(update: Update, context: CallbackContext):
 	if mode == Constants.MP3:
 		file_path = f'{file_path[:-4]}.m4a'
 		log.info(f"Sending audio file: {file_path}")
-		await context.bot.send_audio(chat_id=update.effective_chat.id, audio=file_path)
+		try:
+			await context.bot.send_audio(chat_id=update.effective_chat.id, audio=file_path)
+		except TelegramError:
+			await upload_file_ftp(update, context, file_path)
 	else:
 		log.info(f"Sending video file: {file_path}")
 		try:
