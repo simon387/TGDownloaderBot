@@ -22,6 +22,11 @@ log.level=info
 send.start.and.stop.message=false
 # 1.1 | 2
 http.version=1.1
+ftp.host=
+ftp.url=
+ftp.user=
+ftp.pass=
+ftp.remote.folder=
 ```
 
 ### Setup BotFather
