@@ -39,6 +39,7 @@ ERROR_NOT_VALID_URL = "This is not a valid url!"
 ERROR_UPLOAD = "Error on ftp upload: "
 FTP_MESSAGE_OK = "Video loaded here: "
 FTP_MESSAGE_START = "Loading file to ftp server because is too big for Telegram"
+ERROR_DOWNLOAD = "Error on download, scaling down format"
 # urls
 
 # var

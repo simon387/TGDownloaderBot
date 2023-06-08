@@ -18,6 +18,7 @@ from telegram.constants import ParseMode
 from telegram.error import TelegramError
 from telegram.ext import ApplicationBuilder, CallbackContext, CommandHandler, ContextTypes, Application, AIORateLimiter, CallbackQueryHandler, MessageHandler, \
 	filters
+from yt_dlp import DownloadError
 
 import Constants
 from BotApp import BotApp
@@ -159,9 +160,9 @@ async def keyboard_callback(update: Update, context: CallbackContext):
 		'home': 'download'
 	}
 	if mode == Constants.MP3:
-		ydl_opts = {
+		ydl_opts = {  # for audio
 			'format': 'm4a/bestaudio/best',
-			# ℹ️ See help(yt_dlp.postprocessor) for a list of available Postprocessors and their arguments
+			# See help(yt_dlp.postprocessor) for a list of available Postprocessors and their arguments
 			'postprocessors': [{  # Extract audio using ffmpeg
 				'key': 'FFmpegExtractAudio',
 				'preferredcodec': 'm4a',
@@ -172,16 +173,18 @@ async def keyboard_callback(update: Update, context: CallbackContext):
 			'windowsfilenames': True,
 		}
 	else:
-		ydl_opts = {
+		ydl_opts = {  # for video
+			'restrictfilenames': True,
 			'paths': paths,
 			'trim_file_name': 16,
 			'windowsfilenames': True,
 		}
-	with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-		info = ydl.extract_info(url, download=False)
-		file_path = ydl.prepare_filename(info)
-		log.info(f"Downloaded file into {file_path}")
-		ydl.process_info(info)
+	try:
+		file_path = download_with_yt_dlp(ydl_opts, url)
+	except DownloadError:
+		log.error(Constants.ERROR_DOWNLOAD)
+		ydl_opts['format'] = "18"
+		file_path = download_with_yt_dlp(ydl_opts, url)
 	if mode == Constants.MP3:
 		file_path = f'{file_path[:-4]}.m4a'
 		log.info(f"Sending audio file: {file_path}")
@@ -195,6 +198,15 @@ async def keyboard_callback(update: Update, context: CallbackContext):
 			await context.bot.send_video(chat_id=update.effective_chat.id, video=file_path)
 		except TelegramError:
 			await upload_file_ftp(update, context, file_path)
+
+
+def download_with_yt_dlp(ydl_opts, url):
+	with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+		info = ydl.extract_info(url, download=False)
+		file_path = ydl.prepare_filename(info)
+		log.info(f"Downloaded file into {file_path}")
+		ydl.process_info(info)
+	return file_path
 
 
 async def upload_file_ftp(update: Update, context: CallbackContext, local_file_path):
