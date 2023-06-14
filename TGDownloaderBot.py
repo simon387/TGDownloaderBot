@@ -148,7 +148,8 @@ def validate(msg):
 		"https://fb.watch/" in msg or \
 		"https://www.instagram.com/" in msg or \
 		"https://www.tiktok.com/" in msg or \
-		"https://vm.tiktok.com/" in msg
+		"https://vm.tiktok.com/" in msg or \
+		"https://twitter.com/" in msg
 
 
 async def keyboard_callback(update: Update, context: CallbackContext):

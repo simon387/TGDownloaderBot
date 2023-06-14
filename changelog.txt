@@ -1,3 +1,6 @@
+Version 1.0.12
+- added twitter support
+
 Version 1.0.11
 - no spaces on video files
 - fix for video download https://www.youtube.com/watch?v=DPgdYr-FXTQ
