@@ -2,6 +2,16 @@
 
 Telegram Downloader Bot
 
+It downloads video from:
+
++ youtube
++ facebook
++ instagram
++ tiktok
++ twitter
+
+Theoretically, it could download videos from any webpage, but for now, it only downloads from the above list
+
 ## Dev's Setup
 
 + ```pip install python-telegram-bot --upgrade``` or ```pip install python-telegram-bot -U --pre```
