@@ -78,24 +78,28 @@ async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> N
 	tb_list = traceback.format_exception(None, context.error, context.error.__traceback__)
 	tb_string = "".join(tb_list)
 	# Build the message with some markup and additional information about what happened.
-	# You might need to add some logic to deal with messages longer than the 4096 character limit.
 	update_str = update.to_dict() if isinstance(update, Update) else str(update)
-	message = (
-		f"An exception was raised while handling an update\n"
-		f"<pre>update = {html.escape(json.dumps(update_str, indent=2, ensure_ascii=False))}"
-		"</pre>\n\n"
-		f"<pre>context.chat_data = {html.escape(str(context.chat_data))}</pre>\n\n"
-		f"<pre>context.user_data = {html.escape(str(context.user_data))}</pre>\n\n"
-		f"<pre>{html.escape(tb_string)}</pre>"
-	)
-	message = message[:4300]  # truncate to prevent error
-	if message.count('</pre>') % 2 != 0:
-		message += '</pre>'
-	# Finally, send the message
-	await context.bot.send_message(chat_id=Constants.TELEGRAM_DEVELOPER_CHAT_ID, text=message, parse_mode=ParseMode.HTML)
+	await context.bot.send_message(chat_id=Constants.TELEGRAM_DEVELOPER_CHAT_ID, text=f"An exception was raised while handling an update")
+	await send_error_message(context, f"<pre>update = {html.escape(json.dumps(update_str, indent=2, ensure_ascii=False))}</pre>")
+	await send_error_message(context, f"<pre>context.chat_data = {html.escape(str(context.chat_data))}</pre>")
+	await send_error_message(context, f"<pre>context.user_data = {html.escape(str(context.user_data))}</pre>")
+	await send_error_message(context, f"<pre>{html.escape(tb_string)}</pre>")
 	# Restart the bot
 	time_os.sleep(5.0)
 	os.execl(sys.executable, sys.executable, *sys.argv)
+
+
+async def send_error_message(context: ContextTypes.DEFAULT_TYPE, message):
+	max_length = 4096  # Maximum allowed length for a message
+	chunks = [message[i:i + max_length] for i in range(0, len(message), max_length)]
+	# Send each chunk as a separate message
+	for chunk in chunks:
+		if not chunk.startswith('<pre>'):
+			chunk = '<pre>' + chunk
+		if not chunk.endswith('</pre>'):
+			chunk += '</pre>'
+		# Finally, send the message
+		await context.bot.send_message(chat_id=Constants.TELEGRAM_DEVELOPER_CHAT_ID, text=chunk, parse_mode=ParseMode.HTML)
 
 
 def get_version():
