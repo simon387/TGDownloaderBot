@@ -191,7 +191,8 @@ async def keyboard_callback(update: Update, context: CallbackContext):
 	if is_from_yt(url):
 		ydl_opts['username'] = Constants.YOUTUBE_USER
 		ydl_opts['password'] = Constants.YOUTUBE_PASS
-		ydl_opts['cookiesfrombrowser'] = Constants.COOKIES_PATH
+		if Constants.COOKIES_PATH != Constants.EMPTY:
+			ydl_opts['cookiesfrombrowser'] = Constants.COOKIES_PATH
 	try:
 		file_path = download_with_yt_dlp(ydl_opts, url)
 	except DownloadError:
