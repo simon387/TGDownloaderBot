@@ -37,6 +37,9 @@ ftp.url=
 ftp.user=
 ftp.pass=
 ftp.remote.folder=
+youtube.user=
+youtube.pass=
+cookies.path=chrome:~/.var/app/com.google.Chrome/
 ```
 
 ### Setup BotFather
@@ -78,3 +81,4 @@ For a description of the Bot API, see this page: https://core.telegram.org/bots/
 
 + https://www.gyan.dev/ffmpeg/builds/
 + https://github.com/yt-dlp/yt-dlp/
++ https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp login cookies

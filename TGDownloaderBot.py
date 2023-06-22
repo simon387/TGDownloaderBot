@@ -144,16 +144,20 @@ async def download(update: Update, context: CallbackContext, answer_with_error=T
 
 
 def validate(msg):
-	return ("https://www.youtube." in msg and "/watch?" in msg) or \
-		"https://www.youtube.com/shorts/" in msg or \
-		"https://youtube.com/shorts/" in msg or \
-		"https://youtu.be/" in msg or \
+	return is_from_yt(msg) or \
 		"facebook.com/" in msg or \
 		"https://fb.watch/" in msg or \
 		"https://www.instagram.com/" in msg or \
 		"https://www.tiktok.com/" in msg or \
 		"https://vm.tiktok.com/" in msg or \
 		"https://twitter.com/" in msg
+
+
+def is_from_yt(url):
+	return ("https://www.youtube." in url and "/watch?" in url) or \
+		"https://www.youtube.com/shorts/" in url or \
+		"https://youtube.com/shorts/" in url or \
+		"https://youtu.be/" in url
 
 
 async def keyboard_callback(update: Update, context: CallbackContext):
@@ -184,6 +188,10 @@ async def keyboard_callback(update: Update, context: CallbackContext):
 			'trim_file_name': 16,
 			'windowsfilenames': True,
 		}
+	if is_from_yt(url):
+		ydl_opts['username'] = Constants.YOUTUBE_USER
+		ydl_opts['password'] = Constants.YOUTUBE_PASS
+		ydl_opts['cookiesfrombrowser'] = Constants.COOKIES_PATH
 	try:
 		file_path = download_with_yt_dlp(ydl_opts, url)
 	except DownloadError:

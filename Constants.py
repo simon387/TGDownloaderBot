@@ -28,6 +28,10 @@ FTP_HOST = config.get(APPLICATION, "ftp.host")
 FTP_USER = config.get(APPLICATION, "ftp.user")
 FTP_PASS = config.get(APPLICATION, "ftp.pass")
 FTP_REMOTE_FOLDER = config.get(APPLICATION, "ftp.remote.folder")
+YOUTUBE_USER = config.get(APPLICATION, "youtube.user")
+YOUTUBE_PASS = config.get(APPLICATION, "youtube.pass")
+COOKIES_PATH = config.get(APPLICATION, "cookies.path")
+
 # messages
 STARTUP_MESSAGE = "TGDownloaderBot started! "
 STOP_MESSAGE = "TGDownloaderBot stopped!"
