@@ -39,7 +39,7 @@ ftp.pass=
 ftp.remote.folder=
 youtube.user=
 youtube.pass=
-cookies.path=chrome:~/.var/app/com.google.Chrome/
+cookies.path=chrome:~/.config/google-chrome
 ```
 
 ### Setup BotFather
