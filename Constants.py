@@ -39,7 +39,6 @@ VERSION_MESSAGE = " - more info on https://github.com/simon387/TGDownloaderBot/b
 VALID_LINK_MESSAGE = "This is a valid page link! What do you want to do?"
 ERROR_NO_GRANT_SHUTDOWN = "You can't shutdown the bot!"
 ERROR_CANT_DOWNLOAD = "I can't download this!"
-ERROR_NOT_VALID_URL = "This is not a valid url!"
 ERROR_UPLOAD = "Error on ftp upload: "
 FTP_MESSAGE_OK = "Video loaded here: "
 FTP_MESSAGE_START = "Loading file to ftp server because is too big for Telegram"

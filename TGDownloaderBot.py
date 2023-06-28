@@ -112,35 +112,41 @@ async def chat_check(update: Update, context: CallbackContext):
 	if hasattr(update.message, 'text'):
 		log_bot_event(update, 'chat_check')
 		msg = update.message.text
-		if validators.url(msg) and validate(msg):
-			await download(update, context, False, msg)
+		url = extract_first_url(msg)
+		if url is not None and validators.url(url) and validate(url):
+			await download(update, context, False, url)
+
+
+def extract_first_url(text):
+	url_pattern = re.compile(r"https?://(?:[a-zA-Z]|[0-9]|[$-_]|[!*\\(),])+")
+	matches = re.findall(url_pattern, text)
+	if matches:
+		return matches[0]
+	else:
+		return None
 
 
 async def download(update: Update, context: CallbackContext, answer_with_error=True, msg=''):
 	log_bot_event(update, 'download')
 	if msg == '':
 		msg = Constants.SPACE.join(context.args).strip()
-	if validators.url(msg):
-		if validate(msg):
-			# clean
-			if "https://www.youtube." in msg and "/watch?" in msg:
-				msg = re.sub('&list=.+', '', msg)
-			#
-			keyboard = [
-				[
-					InlineKeyboardButton("Download Audio", callback_data=Constants.MP3),
-					InlineKeyboardButton("Download Video", callback_data=Constants.MP4),
-				]
+	if validate(msg):
+		# clean
+		if "https://www.youtube." in msg and "/watch?" in msg:
+			msg = re.sub('&list=.+', '', msg)
+		#
+		keyboard = [
+			[
+				InlineKeyboardButton("Download Audio", callback_data=Constants.MP3),
+				InlineKeyboardButton("Download Video", callback_data=Constants.MP4),
 			]
-			reply_markup = InlineKeyboardMarkup(keyboard)
-			text = f'<a href="tg://btn/{str(base64.urlsafe_b64encode(msg.encode(Constants.UTF8)))}">\u200b</a>{Constants.VALID_LINK_MESSAGE}'
-			await context.bot.send_message(chat_id=update.effective_chat.id, text=text, reply_markup=reply_markup, parse_mode='HTML')
-		else:
-			if answer_with_error:
-				await context.bot.send_message(chat_id=update.effective_chat.id, text=Constants.ERROR_CANT_DOWNLOAD)
+		]
+		reply_markup = InlineKeyboardMarkup(keyboard)
+		text = f'<a href="tg://btn/{str(base64.urlsafe_b64encode(msg.encode(Constants.UTF8)))}">\u200b</a>{Constants.VALID_LINK_MESSAGE}'
+		await context.bot.send_message(chat_id=update.effective_chat.id, text=text, reply_markup=reply_markup, parse_mode='HTML')
 	else:
 		if answer_with_error:
-			await context.bot.send_message(chat_id=update.effective_chat.id, text=Constants.ERROR_NOT_VALID_URL)
+			await context.bot.send_message(chat_id=update.effective_chat.id, text=Constants.ERROR_CANT_DOWNLOAD)
 
 
 def validate(msg):

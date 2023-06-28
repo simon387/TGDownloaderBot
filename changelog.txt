@@ -1,3 +1,6 @@
+Version 1.0.15
+- intercepts not perfect url function
+
 Version 1.0.14
 - added first support for youtube login, by user + pass and by cookies
 
