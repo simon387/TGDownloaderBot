@@ -11,6 +11,7 @@ TELEGRAM_DEVELOPER_CHAT_ID = config.get(SECRETS, "telegram.developer.chat.id")
 # application's settings
 APPLICATION = "application"
 SEND_START_AND_STOP_MESSAGE = config.get(APPLICATION, "send.start.and.stop.message")
+SEND_ERROR_TO_DEV = config.get(APPLICATION, "send.error.to.dev")
 HTTP_VERSION = config.get(APPLICATION, "http.version")
 AIO_RATE_LIMITER_MAX_RETRIES = 10
 case = config.get(APPLICATION, "log.level")

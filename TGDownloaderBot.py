@@ -73,17 +73,18 @@ def log_bot_event(update: Update, method_name: str):
 async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
 	# Log the error before we do anything else, so we can see it even if something breaks.
 	log.error(msg="Exception while handling an update:", exc_info=context.error)
-	# traceback.format_exception returns the usual python message about an exception, but as a
-	# list of strings rather than a single string, so we have to join them together.
-	tb_list = traceback.format_exception(None, context.error, context.error.__traceback__)
-	tb_string = "".join(tb_list)
-	# Build the message with some markup and additional information about what happened.
-	update_str = update.to_dict() if isinstance(update, Update) else str(update)
-	await context.bot.send_message(chat_id=Constants.TELEGRAM_DEVELOPER_CHAT_ID, text=f"An exception was raised while handling an update")
-	await send_error_message(context, f"<pre>update = {html.escape(json.dumps(update_str, indent=2, ensure_ascii=False))}</pre>")
-	await send_error_message(context, f"<pre>context.chat_data = {html.escape(str(context.chat_data))}</pre>")
-	await send_error_message(context, f"<pre>context.user_data = {html.escape(str(context.user_data))}</pre>")
-	await send_error_message(context, f"<pre>{html.escape(tb_string)}</pre>")
+	if Constants.SEND_ERROR_TO_DEV == 'true':
+		# traceback.format_exception returns the usual python message about an exception, but as a
+		# list of strings rather than a single string, so we have to join them together.
+		tb_list = traceback.format_exception(None, context.error, context.error.__traceback__)
+		tb_string = "".join(tb_list)
+		# Build the message with some markup and additional information about what happened.
+		update_str = update.to_dict() if isinstance(update, Update) else str(update)
+		await context.bot.send_message(chat_id=Constants.TELEGRAM_DEVELOPER_CHAT_ID, text=f"An exception was raised while handling an update")
+		await send_error_message(context, f"<pre>update = {html.escape(json.dumps(update_str, indent=2, ensure_ascii=False))}</pre>")
+		await send_error_message(context, f"<pre>context.chat_data = {html.escape(str(context.chat_data))}</pre>")
+		await send_error_message(context, f"<pre>context.user_data = {html.escape(str(context.user_data))}</pre>")
+		await send_error_message(context, f"<pre>{html.escape(tb_string)}</pre>")
 	# Restart the bot
 	time_os.sleep(5.0)
 	os.execl(sys.executable, sys.executable, *sys.argv)

@@ -30,6 +30,7 @@ telegram.developer.chat.id=WWW
 # log.level = info | debug | error
 log.level=info
 send.start.and.stop.message=false
+send.error.to.dev=true
 # 1.1 | 2
 http.version=1.1
 ftp.host=
