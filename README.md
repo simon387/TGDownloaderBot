@@ -21,6 +21,12 @@ Theoretically, it could download videos from any webpage, but for now, it only d
 + ```sudo dnf install ffmpeg```
 + Create the ```config.properties``` file in the project's directory, and put this content:
 
+### On gnu/linux, cutting-edge version
+
++ ```python3 -m pip install -U pip setuptools wheel```
++ ```python3 -m pip install --force-reinstall https://github.com/yt-dlp/yt-dlp/archive/master.tar.gz```
++ ```python3 -m pip install -U yt-dlp```
+
 ```
 [secrets]
 telegram.token=XXX

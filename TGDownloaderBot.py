@@ -142,9 +142,9 @@ async def download(update: Update, context: CallbackContext, answer_with_error=T
 				InlineKeyboardButton("Download Video", callback_data=Constants.MP4),
 			]
 		]
-		reply_markup = InlineKeyboardMarkup(keyboard)
-		text = f'<a href="tg://btn/{str(base64.urlsafe_b64encode(msg.encode(Constants.UTF8)))}">\u200b</a>{Constants.VALID_LINK_MESSAGE}'
-		await context.bot.send_message(chat_id=update.effective_chat.id, text=text, reply_markup=reply_markup, parse_mode='HTML')
+		markup = InlineKeyboardMarkup(keyboard)
+		txt = f'<a href="tg://btn/{str(base64.urlsafe_b64encode(msg.encode(Constants.UTF8)))}">\u200b</a>{Constants.VALID_LINK_MESSAGE}'
+		await context.bot.send_message(chat_id=update.effective_chat.id, text=txt, reply_markup=markup, parse_mode='HTML', reply_to_message_id=update.message.id)
 	else:
 		if answer_with_error:
 			await context.bot.send_message(chat_id=update.effective_chat.id, text=Constants.ERROR_CANT_DOWNLOAD)
