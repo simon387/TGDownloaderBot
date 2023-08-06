@@ -63,7 +63,9 @@ async def post_shutdown(app: Application):
 
 
 def log_bot_event(update: Update, method_name: str):
-	msg = update.message.text
+	msg = 'No message, just a click'
+	if update.message is not None:
+		msg = update.message.text
 	user = update.effective_user.first_name
 	uid = update.effective_user.id
 	log.info(f"[method={method_name}] Got this message from {user} [id={str(uid)}]: {msg}")
@@ -142,9 +144,9 @@ async def download(update: Update, context: CallbackContext, answer_with_error=T
 				InlineKeyboardButton("Download Video", callback_data=Constants.MP4),
 			]
 		]
-		markup = InlineKeyboardMarkup(keyboard)
+		mu = InlineKeyboardMarkup(keyboard)
 		txt = f'<a href="tg://btn/{str(base64.urlsafe_b64encode(msg.encode(Constants.UTF8)))}">\u200b</a>{Constants.VALID_LINK_MESSAGE}'
-		await context.bot.send_message(chat_id=update.effective_chat.id, text=txt, reply_markup=markup, parse_mode='HTML', reply_to_message_id=update.message.id)
+		await context.bot.send_message(chat_id=update.effective_chat.id, text=txt, reply_markup=mu, parse_mode='HTML', reply_to_message_id=update.message.id)
 	else:
 		if answer_with_error:
 			await context.bot.send_message(chat_id=update.effective_chat.id, text=Constants.ERROR_CANT_DOWNLOAD)
@@ -167,7 +169,8 @@ def is_from_yt(url):
 		"https://youtu.be/" in url
 
 
-async def keyboard_callback(update: Update, context: CallbackContext):
+async def click_callback(update: Update, context: CallbackContext):
+	log_bot_event(update, 'click_callback')
 	query = update.callback_query
 	mode = query.data
 	url = str(base64.urlsafe_b64decode(query.message.entities[0].url[11:]))[2:-1]
@@ -262,7 +265,7 @@ if __name__ == '__main__':
 	application.add_handler(CommandHandler('version', send_version))
 	application.add_handler(CommandHandler('shutdown', send_shutdown))
 	application.add_handler(CommandHandler('download', download))
-	application.add_handler(CallbackQueryHandler(keyboard_callback))
+	application.add_handler(CallbackQueryHandler(click_callback))
 	application.add_handler(MessageHandler(filters.TEXT, chat_check))
 	application.add_error_handler(error_handler)
 	application.run_polling(allowed_updates=Update.ALL_TYPES)

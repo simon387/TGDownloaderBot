@@ -1,3 +1,6 @@
+Version 1.0.18
+- added more logs
+
 Version 1.0.17
 - added reply to specific message
 - added instruction on linux for more updated ytdl library
