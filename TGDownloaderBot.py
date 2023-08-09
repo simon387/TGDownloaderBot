@@ -62,6 +62,7 @@ async def post_shutdown(app: Application):
 	log.info(f"Shutting down, bot id={str(app.bot.id)}")
 
 
+# v1.0, highest but custom
 def log_bot_event(update: Update, method_name: str):
 	msg = 'No message, just a click'
 	if update.message is not None:
