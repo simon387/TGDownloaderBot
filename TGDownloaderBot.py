@@ -36,6 +36,9 @@ log.basicConfig(
 	level=Constants.LOG_LEVEL
 )
 
+if Constants.LOG_LEVEL > log.INFO:
+	log.getLogger('httpx').setLevel(log.WARNING)
+
 
 async def send_version(update: Update, context: CallbackContext):
 	log_bot_event(update, 'send_version')

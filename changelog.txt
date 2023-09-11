@@ -1,3 +1,6 @@
+Version 1.0.19
+- fix log level bug on windows
+
 Version 1.0.18
 - added more logs
 
