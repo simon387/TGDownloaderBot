@@ -36,7 +36,7 @@ log.basicConfig(
 	level=Constants.LOG_LEVEL
 )
 
-if Constants.LOG_LEVEL > log.INFO:
+if Constants.LOG_LEVEL <= log.INFO:
 	log.getLogger('httpx').setLevel(log.WARNING)
 
 
