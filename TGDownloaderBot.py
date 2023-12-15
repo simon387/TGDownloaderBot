@@ -79,7 +79,7 @@ def log_bot_event(update: Update, method_name: str):
 async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
 	# Log the error before we do anything else, so we can see it even if something breaks.
 	log.error(msg="Exception while handling an update:", exc_info=context.error)
-	if Constants.SEND_ERROR_TO_DEV == 'true':
+	if Constants.SEND_ERROR_TO_DEV == 'true' or Constants.SEND_ERROR_TO_USER == 'true':
 		# traceback.format_exception returns the usual python message about an exception, but as a
 		# list of strings rather than a single string, so we have to join them together.
 		tb_list = traceback.format_exception(None, context.error, context.error.__traceback__)
@@ -87,16 +87,16 @@ async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> N
 		# Build the message with some markup and additional information about what happened.
 		update_str = update.to_dict() if isinstance(update, Update) else str(update)
 		await context.bot.send_message(chat_id=Constants.TELEGRAM_DEVELOPER_CHAT_ID, text=f"An exception was raised while handling an update")
-		await send_error_message(context, f"<pre>update = {html.escape(json.dumps(update_str, indent=2, ensure_ascii=False))}</pre>")
-		await send_error_message(context, f"<pre>context.chat_data = {html.escape(str(context.chat_data))}</pre>")
-		await send_error_message(context, f"<pre>context.user_data = {html.escape(str(context.user_data))}</pre>")
-		await send_error_message(context, f"<pre>{html.escape(tb_string)}</pre>")
+		await send_error_message(update, context, f"<pre>update = {html.escape(json.dumps(update_str, indent=2, ensure_ascii=False))}</pre>")
+		await send_error_message(update, context, f"<pre>context.chat_data = {html.escape(str(context.chat_data))}</pre>")
+		await send_error_message(update, context, f"<pre>context.user_data = {html.escape(str(context.user_data))}</pre>")
+		await send_error_message(update, context, f"<pre>{html.escape(tb_string)}</pre>")
 	# Restart the bot
 	time_os.sleep(5.0)
 	os.execl(sys.executable, sys.executable, *sys.argv)
 
 
-async def send_error_message(context: ContextTypes.DEFAULT_TYPE, message):
+async def send_error_message(update: Update, context: ContextTypes.DEFAULT_TYPE, message):
 	max_length = 4096  # Maximum allowed length for a message
 	chunks = [message[i:i + max_length] for i in range(0, len(message), max_length)]
 	# Send each chunk as a separate message
@@ -106,7 +106,10 @@ async def send_error_message(context: ContextTypes.DEFAULT_TYPE, message):
 		if not chunk.endswith('</pre>'):
 			chunk += '</pre>'
 		# Finally, send the message
-		await context.bot.send_message(chat_id=Constants.TELEGRAM_DEVELOPER_CHAT_ID, text=chunk, parse_mode=ParseMode.HTML)
+		if Constants.SEND_ERROR_TO_DEV == 'true':
+			await context.bot.send_message(chat_id=Constants.TELEGRAM_DEVELOPER_CHAT_ID, text=chunk, parse_mode=ParseMode.HTML)
+		else:
+			await context.bot.send_message(chat_id=update.effective_chat.id, text=chunk, parse_mode=ParseMode.HTML)
 
 
 def get_version():
