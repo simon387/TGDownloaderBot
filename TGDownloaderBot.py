@@ -108,8 +108,9 @@ async def send_error_message(update: Update, context: ContextTypes.DEFAULT_TYPE,
 		# Finally, send the message
 		if Constants.SEND_ERROR_TO_DEV == 'true':
 			await context.bot.send_message(chat_id=Constants.TELEGRAM_DEVELOPER_CHAT_ID, text=chunk, parse_mode=ParseMode.HTML)
-		if Constants.SEND_ERROR_TO_USER == 'true':
-			await context.bot.send_message(chat_id=update.effective_chat.id, text=chunk, parse_mode=ParseMode.HTML)
+		if Constants.SEND_ERROR_TO_USER == 'true' and update is not None:
+			if update.effective_chat.id:
+				await context.bot.send_message(chat_id=update.effective_chat.id, text=chunk, parse_mode=ParseMode.HTML)
 
 
 def get_version():
