@@ -167,7 +167,8 @@ def validate(msg):
 		"https://www.instagram.com/" in msg or \
 		"https://www.tiktok.com/" in msg or \
 		"https://vm.tiktok.com/" in msg or \
-		"https://twitter.com/" in msg
+		"https://twitter.com/" in msg or \
+		"https://x.com/" in msg
 
 
 def is_from_yt(url):
