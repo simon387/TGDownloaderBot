@@ -84,6 +84,7 @@ For a description of the Bot API, see this page: https://core.telegram.org/bots/
 + ~~https://youtube.com/shorts/rb4LEDH9EB8?feature=share timeout (custom ftp)~~
 + ~~https://fb.watch/kafb9dYydS/~~ fb login https://github.com/yt-dlp/yt-dlp/issues/2140
 + https://youtu.be/7QiPGNmWZj8 18+, yt login
++ try jDownloader command line
 
 ## Links
 
