@@ -89,9 +89,9 @@ async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> N
 		await context.bot.send_message(chat_id=C.TELEGRAM_DEVELOPER_CHAT_ID, text=f"An exception was raised while handling an update")
 		if update_str != C.NONE:
 			await send_error_message(update, context, f"{C.PRE}update = {html.escape(json.dumps(update_str, indent=2, ensure_ascii=False))}{C.PRC}")
-		if context.chat_data is not None:
+		if context.chat_data != {}:
 			await send_error_message(update, context, f"{C.PRE}context.chat_data = {html.escape(str(context.chat_data))}{C.PRC}")
-		if context.user_data is not None:
+		if context.user_data != {}:
 			await send_error_message(update, context, f"{C.PRE}context.user_data = {html.escape(str(context.user_data))}{C.PRC}")
 		await send_error_message(update, context, f"{C.PRE}{html.escape(tb_string)}{C.PRC}")
 	# Restart the bot
