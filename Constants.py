@@ -54,3 +54,6 @@ MP3 = "MP3"
 MP4 = "MP4"
 TRUE = "true"
 UTF8 = "utf-8"
+NONE = 'None'
+PRE = '<pre>'
+PRC = '</pre>'
