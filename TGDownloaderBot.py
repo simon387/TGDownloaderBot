@@ -133,7 +133,7 @@ async def chat_check(update: Update, context: CallbackContext):
 		msg = update.message.text
 		url = extract_first_url(msg)
 		if url is not None and validators.url(url) and validate(url):
-			await download(update, context, False, url)
+			await show_download_buttons(update, context, False, url)
 
 
 def extract_first_url(text):
@@ -145,7 +145,7 @@ def extract_first_url(text):
 		return None
 
 
-async def download(update: Update, context: CallbackContext, answer_with_error=True, msg=C.EMPTY):
+async def show_download_buttons(update: Update, context: CallbackContext, answer_with_error=True, msg=C.EMPTY):
 	log_bot_event(update, 'download')
 	if msg == C.EMPTY:
 		msg = C.SPACE.join(context.args).strip()
@@ -318,7 +318,7 @@ if __name__ == '__main__':
 		.build()
 	application.add_handler(CommandHandler('version', send_version))
 	application.add_handler(CommandHandler('shutdown', send_shutdown))
-	application.add_handler(CommandHandler('download', download))
+	application.add_handler(CommandHandler('download', show_download_buttons))
 	application.add_handler(CallbackQueryHandler(click_callback))
 	application.add_handler(MessageHandler(filters.TEXT, chat_check))
 	application.add_error_handler(error_handler)

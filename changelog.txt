@@ -1,3 +1,6 @@
+Version 1.0.31
+- code refactoring
+
 Version 1.0.30
 - code refactoring
 

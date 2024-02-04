@@ -38,7 +38,7 @@ try:
 	with youtube_dl.YoutubeDL(y) as u:
 		print("Downloading........."+url)
 		# download the video
-		u.download([url])
+		u.show_download_buttons([url])
 except Exception as asd:
 	print("Invalid link or selected resolution unavailable!")
 	sys.exit(1)
