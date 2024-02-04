@@ -229,12 +229,24 @@ async def click_callback(update: Update, context: CallbackContext):
 	except Exception as e:
 		log.error('Switching to you-get due to Download KO:', str(e))
 		# you-get -o ~/Videos -O zoo.webm 'https://www.youtube.com/watch?v=jNQXAC9IVRw'
-		command = ["you-get", "-o", "/download", "-O", "o.webm"]
+		command = ["you-get", "-k", "-f", "-o", "download/o", "-O", "__o", url]
+		log.info("you-get -k -f -o download/o -O __o " + url)
 		result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 		if result.returncode == 0:
 			print("Command executed successfully!")
 			print("Output:")
 			print(result.stdout)
+
+			# Percorso relativo
+			path_relativo = "download/o"
+
+			# Ottieni il percorso assoluto
+			path_assoluto = os.path.abspath(path_relativo)
+
+			# Trova il nome completo del primo file con il prefisso "__o." nel percorso specificato
+			file_path = trova_file_con_prefisso(path_assoluto)
+			print(file_path)
+
 		else:
 			print("Error executing command:")
 			print(result.stderr)
@@ -252,6 +264,19 @@ async def click_callback(update: Update, context: CallbackContext):
 		except TelegramError:
 			await upload_file_ftp(update, context, file_path)
 
+def trova_file_con_prefisso(path):
+    # Ottieni la lista di tutti i file nel percorso specificato
+    files = os.listdir(path)
+    
+    # Scorri tutti i file nel percorso
+    for file in files:
+        # Verifica se il file inizia con il prefisso "__o."
+        if file.startswith("__o."):
+            # Ritorna il nome completo del primo file trovato con estensione
+            return file
+    
+    # Se nessun file con il prefisso "__o." è stato trovato, ritorna None
+    return None
 
 def download_with_yt_dlp(ydl_opts, url):
 	with yt_dlp.YoutubeDL(ydl_opts) as ydl:
