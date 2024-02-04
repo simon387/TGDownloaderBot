@@ -12,9 +12,9 @@ import time as time_os
 import traceback
 from logging.handlers import RotatingFileHandler
 
+import telegram
 import validators
 import yt_dlp
-import telegram
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.constants import ParseMode
 from telegram.error import TelegramError
@@ -187,6 +187,7 @@ def is_from_yt(url):
 
 
 async def click_callback(update: Update, context: CallbackContext):
+	file_path = ""
 	log_bot_event(update, 'click_callback')
 	query = update.callback_query
 	mode = query.data
@@ -228,28 +229,21 @@ async def click_callback(update: Update, context: CallbackContext):
 		file_path = download_with_yt_dlp(ydl_opts, url)
 	except Exception as e:
 		log.error('Switching to you-get due to Download KO:', str(e))
-		# you-get -o ~/Videos -O zoo.webm 'https://www.youtube.com/watch?v=jNQXAC9IVRw'
-		command = ["you-get", "-k", "-f", "-o", "download/o", "-O", "__o", url]
-		log.info("you-get -k -f -o download/o -O __o " + url)
+		command = ["you-get", "-k", "-f", "-o", C.YOU_GET_DWN_PATH, "-O", C.PREFIX, url]
+		log.info(f"you-get -k -f -o {C.YOU_GET_DWN_PATH} -O {C.PREFIX} {url}")
+		await context.bot.send_message(chat_id=update.effective_chat.id, text=C.WAIT_MESSAGE)
 		result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 		if result.returncode == 0:
-			print("Command executed successfully!")
-			print("Output:")
-			print(result.stdout)
-
-			# Percorso relativo
-			path_relativo = "download/o"
-
-			# Ottieni il percorso assoluto
-			path_assoluto = os.path.abspath(path_relativo)
-
+			log.info("Command executed successfully!")
+			log.info("Output:")
+			log.info(result.stdout)
+			path_assoluto = os.path.abspath(C.YOU_GET_DWN_PATH)
 			# Trova il nome completo del primo file con il prefisso "__o." nel percorso specificato
-			file_path = trova_file_con_prefisso(path_assoluto)
-			print(file_path)
-
+			file_path = find_file_with_prefix(path_assoluto)
+			file_path = os.path.join(C.YOU_GET_DWN_PATH, file_path)
 		else:
-			print("Error executing command:")
-			print(result.stderr)
+			log.error("Error executing command:")
+			log.error(result.stderr)
 	if mode == C.MP3:
 		file_path = f'{file_path[:-4]}.m4a'
 		log.info(f"Sending audio file: {file_path}")
@@ -264,19 +258,14 @@ async def click_callback(update: Update, context: CallbackContext):
 		except TelegramError:
 			await upload_file_ftp(update, context, file_path)
 
-def trova_file_con_prefisso(path):
-    # Ottieni la lista di tutti i file nel percorso specificato
-    files = os.listdir(path)
-    
-    # Scorri tutti i file nel percorso
-    for file in files:
-        # Verifica se il file inizia con il prefisso "__o."
-        if file.startswith("__o."):
-            # Ritorna il nome completo del primo file trovato con estensione
-            return file
-    
-    # Se nessun file con il prefisso "__o." è stato trovato, ritorna None
-    return None
+
+def find_file_with_prefix(path):
+	files = os.listdir(path)
+	for file in files:
+		if file.startswith(C.YOU_GET_DWN_PATH + "."):
+			return file
+	return None
+
 
 def download_with_yt_dlp(ydl_opts, url):
 	with yt_dlp.YoutubeDL(ydl_opts) as ydl:
