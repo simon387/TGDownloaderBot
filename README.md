@@ -19,7 +19,9 @@ Theoretically, it could download videos from any webpage, but for now, it only d
 + ```pip install validators```
 + ```pip install -U yt-dlp```
 + ```sudo dnf install ffmpeg```
++ ```pip3 install you-get```
 + Create the ```config.properties``` file in the project's directory, and put this content:
+
 
 ```
 [secrets]
@@ -28,6 +30,7 @@ telegram.group.id=-ZZZ
 telegram.developer.chat.id=WWW
 [application]
 # log.level = info | debug | error
+dev.mode=false
 log.level=info
 send.start.and.stop.message=false
 send.error.to.dev=true

@@ -6,6 +6,7 @@ import logging as log
 import os
 import re
 import signal
+import subprocess
 import sys
 import time as time_os
 import traceback
@@ -98,8 +99,9 @@ async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> N
 				await send_error_message(update, context, f"{C.PRE}context.user_data = {html.escape(str(context.user_data))}{C.PRC}")
 			await send_error_message(update, context, f"{C.PRE}{html.escape(tb_string)}{C.PRC}")
 	# Restart the bot
-	time_os.sleep(5.0)
-	os.execl(sys.executable, sys.executable, *sys.argv)
+	if C.DEV_MODE != C.TRUE:
+		time_os.sleep(5.0)
+		os.execl(sys.executable, sys.executable, *sys.argv)
 
 
 async def send_error_message(update: Update, context: ContextTypes.DEFAULT_TYPE, message):
@@ -224,6 +226,18 @@ async def click_callback(update: Update, context: CallbackContext):
 		log.error(C.ERROR_DOWNLOAD)
 		ydl_opts['format'] = "18"
 		file_path = download_with_yt_dlp(ydl_opts, url)
+	except Exception as e:
+		log.error('Switching to you-get due to Download KO:', str(e))
+		# you-get -o ~/Videos -O zoo.webm 'https://www.youtube.com/watch?v=jNQXAC9IVRw'
+		command = ["you-get", "-o", "/download", "-O", "o.webm"]
+		result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+		if result.returncode == 0:
+			print("Command executed successfully!")
+			print("Output:")
+			print(result.stdout)
+		else:
+			print("Error executing command:")
+			print(result.stderr)
 	if mode == C.MP3:
 		file_path = f'{file_path[:-4]}.m4a'
 		log.info(f"Sending audio file: {file_path}")
