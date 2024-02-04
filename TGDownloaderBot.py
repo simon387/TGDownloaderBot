@@ -187,35 +187,12 @@ def is_from_yt(url):
 
 
 async def click_callback(update: Update, context: CallbackContext):
-	file_path = ""
 	log_bot_event(update, 'click_callback')
 	query = update.callback_query
 	mode = query.data
 	url = str(base64.urlsafe_b64decode(query.message.entities[0].url[11:]))[2:-1]
 	await query.answer(f'selected: download from {url}')
-	paths = {
-		'home': 'download'
-	}
-	if mode == C.MP3:
-		ydl_opts = {  # for audio
-			'format': 'm4a/bestaudio/best',
-			# See help(yt_dlp.postprocessor) for a list of available Postprocessors and their arguments
-			'postprocessors': [{  # Extract audio using ffmpeg
-				'key': 'FFmpegExtractAudio',
-				'preferredcodec': 'm4a',
-			}],
-			'restrictfilenames': True,
-			'paths': paths,
-			'trim_file_name': 16,
-			'windowsfilenames': True,
-		}
-	else:
-		ydl_opts = {  # for video
-			'restrictfilenames': True,
-			'paths': paths,
-			'trim_file_name': 16,
-			'windowsfilenames': True,
-		}
+	ydl_opts = get_ydl_opts(mode)
 	if is_from_yt(url):
 		ydl_opts['username'] = C.YOUTUBE_USER
 		ydl_opts['password'] = C.YOUTUBE_PASS
@@ -228,22 +205,11 @@ async def click_callback(update: Update, context: CallbackContext):
 		ydl_opts['format'] = "18"
 		file_path = download_with_yt_dlp(ydl_opts, url)
 	except Exception as e:
-		log.error('Switching to you-get due to Download KO:', str(e))
-		command = ["you-get", "-k", "-f", "-o", C.YOU_GET_DWN_PATH, "-O", C.PREFIX, url]
-		log.info(f"you-get -k -f -o {C.YOU_GET_DWN_PATH} -O {C.PREFIX} {url}")
-		await context.bot.send_message(chat_id=update.effective_chat.id, text=C.WAIT_MESSAGE)
-		result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-		if result.returncode == 0:
-			log.info("Command executed successfully!")
-			log.info("Output:")
-			log.info(result.stdout)
-			path_assoluto = os.path.abspath(C.YOU_GET_DWN_PATH)
-			# Trova il nome completo del primo file con il prefisso "__o." nel percorso specificato
-			file_path = find_file_with_prefix(path_assoluto)
-			file_path = os.path.join(C.YOU_GET_DWN_PATH, file_path)
-		else:
-			log.error("Error executing command:")
-			log.error(result.stderr)
+		file_path = download_with_you_get(e, url, context, update)
+	await send_media(mode, file_path, context, update)
+
+
+async def send_media(mode, file_path, context, update):
 	if mode == C.MP3:
 		file_path = f'{file_path[:-4]}.m4a'
 		log.info(f"Sending audio file: {file_path}")
@@ -257,6 +223,51 @@ async def click_callback(update: Update, context: CallbackContext):
 			await context.bot.send_video(chat_id=update.effective_chat.id, video=file_path)
 		except TelegramError:
 			await upload_file_ftp(update, context, file_path)
+
+
+def get_ydl_opts(mode):
+	paths = {
+		'home': 'download'
+	}
+	if mode == C.MP3:
+		return {  # for audio
+			'format': 'm4a/bestaudio/best',
+			# See help(yt_dlp.postprocessor) for a list of available Postprocessors and their arguments
+			'postprocessors': [{  # Extract audio using ffmpeg
+				'key': 'FFmpegExtractAudio',
+				'preferredcodec': 'm4a',
+			}],
+			'restrictfilenames': True,
+			'paths': paths,
+			'trim_file_name': 16,
+			'windowsfilenames': True,
+		}
+	else:
+		return {  # for video
+			'restrictfilenames': True,
+			'paths': paths,
+			'trim_file_name': 16,
+			'windowsfilenames': True,
+		}
+
+
+async def download_with_you_get(e, url, context, update):
+	log.error('Switching to you-get due to Download KO:', str(e))
+	command = ["you-get", "-k", "-f", "-o", C.YOU_GET_DWN_PATH, "-O", C.PREFIX, url]
+	log.info(f"you-get -k -f -o {C.YOU_GET_DWN_PATH} -O {C.PREFIX} {url}")
+	await context.bot.send_message(chat_id=update.effective_chat.id, text=C.WAIT_MESSAGE)
+	result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+	if result.returncode == 0:
+		log.info("Command executed successfully!")
+		log.info("Output:")
+		log.info(result.stdout)
+		path_assoluto = os.path.abspath(C.YOU_GET_DWN_PATH)
+		file_path = find_file_with_prefix(path_assoluto)
+		return os.path.join(C.YOU_GET_DWN_PATH, file_path)
+	else:
+		log.error("Error executing command:")
+		log.error(result.stderr)
+	return None
 
 
 def find_file_with_prefix(path):
