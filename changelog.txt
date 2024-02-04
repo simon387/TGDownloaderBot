@@ -1,3 +1,6 @@
+Version 1.0.29
+- fix prefix bug
+
 Version 1.0.28
 - added you-get option
 - added dev-mode

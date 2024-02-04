@@ -262,7 +262,7 @@ async def click_callback(update: Update, context: CallbackContext):
 def find_file_with_prefix(path):
 	files = os.listdir(path)
 	for file in files:
-		if file.startswith(C.YOU_GET_DWN_PATH + "."):
+		if file.startswith(C.PREFIX + "."):
 			return file
 	return None
 
