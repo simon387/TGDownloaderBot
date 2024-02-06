@@ -205,7 +205,7 @@ async def click_callback(update: Update, context: CallbackContext):
 		ydl_opts['format'] = "18"
 		file_path = download_with_yt_dlp(ydl_opts, url)
 	except Exception as e:
-		file_path = download_with_you_get(e, url, context, update)
+		file_path = await download_with_you_get(e, url, context, update)
 	await send_media(mode, file_path, context, update)
 
 
