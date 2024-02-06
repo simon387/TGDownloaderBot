@@ -206,6 +206,7 @@ async def click_callback(update: Update, context: CallbackContext):
 		file_path = download_with_yt_dlp(ydl_opts, url)
 	except Exception as e:
 		file_path = await download_with_you_get(e, url, context, update)
+	# todo: check file_path? 
 	await send_media(mode, file_path, context, update)
 
 
