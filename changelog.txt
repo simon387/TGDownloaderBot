@@ -1,3 +1,6 @@
+Version 1.0.32
+- fix await error bug
+
 Version 1.0.31
 - code refactoring
 
