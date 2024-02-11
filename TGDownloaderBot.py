@@ -4,8 +4,10 @@ import html
 import json
 import logging as log
 import os
+import random
 import re
 import signal
+import string
 import subprocess
 import sys
 import time as time_os
@@ -253,22 +255,28 @@ def get_ydl_opts(mode):
 
 
 async def download_with_you_get(e, url, context, update):
+	path = C.YOU_GET_DWN_PATH + generate_random_string(16)
 	log.error('Switching to you-get due to Download KO:', str(e))
-	command = ["you-get", "-k", "-f", "-o", C.YOU_GET_DWN_PATH, "-O", C.PREFIX, url]
-	log.info(f"you-get -k -f -o {C.YOU_GET_DWN_PATH} -O {C.PREFIX} {url}")
+	command = ["you-get", "-k", "-f", "-o", path, "-O", C.PREFIX, url]
+	log.info(f"you-get -k -f -o {path} -O {C.PREFIX} {url}")
 	await context.bot.send_message(chat_id=update.effective_chat.id, text=C.WAIT_MESSAGE)
 	result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 	if result.returncode == 0:
 		log.info("Command executed successfully!")
 		log.info("Output:")
 		log.info(result.stdout)
-		path_assoluto = os.path.abspath(C.YOU_GET_DWN_PATH)
+		path_assoluto = os.path.abspath(path)
 		file_path = find_file_with_prefix(path_assoluto)
-		return os.path.join(C.YOU_GET_DWN_PATH, file_path)
+		return os.path.join(path, file_path)
 	else:
 		log.error("Error executing command:")
 		log.error(result.stderr)
 	return None
+
+
+def generate_random_string(length):
+	letters = string.ascii_letters
+	return ''.join(random.choice(letters) for _ in range(length))
 
 
 def find_file_with_prefix(path):
