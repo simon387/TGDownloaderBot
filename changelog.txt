@@ -1,5 +1,6 @@
 Version 1.0.33
 - edited download folder path to a random one
+- added download message
 
 Version 1.0.32
 - fix await error bug

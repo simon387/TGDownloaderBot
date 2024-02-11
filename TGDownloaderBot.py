@@ -255,12 +255,13 @@ def get_ydl_opts(mode):
 
 
 async def download_with_you_get(e, url, context, update):
-	path = C.YOU_GET_DWN_PATH + generate_random_string(16)
+	path = C.YOU_GET_DWN_PATH_PREFIX + generate_random_string(16)
 	log.error('Switching to you-get due to Download KO:', str(e))
-	command = ["you-get", "-k", "-f", "-o", path, "-O", C.PREFIX, url]
-	log.info(f"you-get -k -f -o {path} -O {C.PREFIX} {url}")
+	command = ["you-get", "-k", "-f", "-o", path, "-O", C.VIDEO_FILE_NAME, url]
+	log.info(f"you-get -k -f -o {path} -O {C.VIDEO_FILE_NAME} {url}")
 	await context.bot.send_message(chat_id=update.effective_chat.id, text=C.WAIT_MESSAGE)
 	result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+	await context.bot.send_message(chat_id=update.effective_chat.id, text=C.DOWNLOAD_COMPLETE_MESSAGE)
 	if result.returncode == 0:
 		log.info("Command executed successfully!")
 		log.info("Output:")
@@ -276,13 +277,13 @@ async def download_with_you_get(e, url, context, update):
 
 def generate_random_string(length):
 	letters = string.ascii_letters
-	return ''.join(random.choice(letters) for _ in range(length))
+	return C.EMPTY.join(random.choice(letters) for _ in range(length))
 
 
 def find_file_with_prefix(path):
 	files = os.listdir(path)
 	for file in files:
-		if file.startswith(C.PREFIX + "."):
+		if file.startswith(C.VIDEO_FILE_NAME + "."):
 			return file
 	return None
 

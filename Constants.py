@@ -47,6 +47,7 @@ FTP_MESSAGE_OK = "Video loaded here: "
 FTP_MESSAGE_START = "Loading file to ftp server because is too big for Telegram"
 ERROR_DOWNLOAD = "Error on download, scaling down format"
 WAIT_MESSAGE = "Wait please..."
+DOWNLOAD_COMPLETE_MESSAGE = "... download completed"
 # urls
 
 # var
@@ -59,5 +60,5 @@ UTF8 = "utf-8"
 NONE = "None"
 PRE = "<pre>"
 PRC = "</pre>"
-PREFIX = "__o"
-YOU_GET_DWN_PATH = "download/o"
+VIDEO_FILE_NAME = "video"
+YOU_GET_DWN_PATH_PREFIX = "download/o"
