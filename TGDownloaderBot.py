@@ -84,7 +84,7 @@ async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> N
 	# Log the error before we do anything else, so we can see it even if something breaks.
 	log.error(msg="Exception while handling an update:", exc_info=context.error)
 	# No Network, no send message!
-	if not isinstance(context.error, telegram.error.NetworkError):
+	if not isinstance(context.error, telegram.error.NetworkError) and not isinstance(context.error, telegram.error.TimedOut):
 		if C.SEND_ERROR_TO_DEV == C.TRUE or C.SEND_ERROR_TO_USER == C.TRUE:
 			# traceback.format_exception returns the usual python message about an exception, but as a
 			# list of strings rather than a single string, so we have to join them together.
