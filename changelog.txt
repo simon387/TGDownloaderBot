@@ -1,3 +1,6 @@
+Version 1.0.36
+- fix restart parameters
+
 Version 1.0.35
 - test restart bug
 

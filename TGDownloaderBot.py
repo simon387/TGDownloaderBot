@@ -22,6 +22,7 @@ from telegram.constants import ParseMode
 from telegram.error import TelegramError
 from telegram.ext import ApplicationBuilder, CallbackContext, CommandHandler, ContextTypes, Application, AIORateLimiter, CallbackQueryHandler, MessageHandler, \
 	filters
+# noinspection PyProtectedMember
 from yt_dlp import DownloadError
 
 import Constants as C
@@ -65,7 +66,8 @@ async def post_init(app: Application):
 		await app.bot.send_message(chat_id=C.TELEGRAM_DEVELOPER_CHAT_ID, text=C.STARTUP_MESSAGE + version, parse_mode=ParseMode.HTML)
 
 
-async def post_shutdown():
+# noinspection PyUnusedLocal
+async def post_shutdown(app: Application):
 	log.info(f"Shutting down the bot")
 
 
