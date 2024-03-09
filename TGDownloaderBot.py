@@ -103,7 +103,7 @@ async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> N
 				await send_error_message(update, context, f"{C.PRE}context.user_data = {html.escape(str(context.user_data))}{C.PRC}")
 			await send_error_message(update, context, f"{C.PRE}{html.escape(tb_string)}{C.PRC}")
 	# Restart the bot
-	if C.DEV_MODE != C.TRUE:
+	if C.RESTART_FLAG == C.TRUE:
 		time_os.sleep(5.0)
 		os.execl(sys.executable, sys.executable, *sys.argv)
 

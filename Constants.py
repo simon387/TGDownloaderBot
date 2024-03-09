@@ -10,7 +10,7 @@ TELEGRAM_GROUP_ID = config.get(SECRETS, "telegram.group.id")
 TELEGRAM_DEVELOPER_CHAT_ID = config.get(SECRETS, "telegram.developer.chat.id")
 # application's settings
 APPLICATION = "application"
-DEV_MODE = config.get(APPLICATION, "dev.mode")
+RESTART_FLAG = config.get(APPLICATION, "restart.flag")
 SEND_START_AND_STOP_MESSAGE = config.get(APPLICATION, "send.start.and.stop.message")
 SEND_ERROR_TO_DEV = config.get(APPLICATION, "send.error.to.dev")
 SEND_ERROR_TO_USER = config.get(APPLICATION, "send.error.to.user")

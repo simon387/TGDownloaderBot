@@ -1,3 +1,7 @@
+Version 1.0.37
+- added restart flag
+- removed dev mode
+
 Version 1.0.36
 - fix restart parameters
 

@@ -30,7 +30,7 @@ telegram.group.id=-ZZZ
 telegram.developer.chat.id=WWW
 [application]
 # log.level = info | debug | error
-dev.mode=false
+restart.flag=false
 log.level=info
 send.start.and.stop.message=false
 send.error.to.dev=true
