@@ -203,11 +203,11 @@ async def click_callback(update: Update, context: CallbackContext):
 		if C.COOKIES_PATH != C.EMPTY:
 			ydl_opts['cookiesfrombrowser'] = C.COOKIES_PATH
 	try:
-		file_path = download_with_yt_dlp(ydl_opts, url)
+		file_path = download_with_yt_dlp(ydl_opts, url, context, update)
 	except DownloadError:
 		log.error(C.ERROR_DOWNLOAD)
 		ydl_opts['format'] = "18"
-		file_path = download_with_yt_dlp(ydl_opts, url)
+		file_path = download_with_yt_dlp(ydl_opts, url, context, update)
 	except Exception as e:
 		file_path = await download_with_you_get(e, url, context, update)
 	# todo: check file_path? 
@@ -290,12 +290,14 @@ def find_file_with_prefix(path):
 	return None
 
 
-def download_with_yt_dlp(ydl_opts, url):
+async def download_with_yt_dlp(ydl_opts, url, context, update):
+	await context.bot.send_message(chat_id=update.effective_chat.id, text=C.WAIT_MESSAGE)
 	with yt_dlp.YoutubeDL(ydl_opts) as ydl:
 		info = ydl.extract_info(url, download=False)
 		file_path = ydl.prepare_filename(info)
 		log.info(f"Downloaded file into {file_path}")
 		ydl.process_info(info)
+		await context.bot.send_message(chat_id=update.effective_chat.id, text=C.DOWNLOAD_COMPLETE_MESSAGE)
 	return file_path
 
 

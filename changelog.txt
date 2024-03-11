@@ -1,3 +1,6 @@
+Version 1.0.38
+- added download messages
+
 Version 1.0.37
 - added restart flag
 - removed dev mode
