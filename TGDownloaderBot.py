@@ -203,13 +203,17 @@ async def click_callback(update: Update, context: CallbackContext):
 		if C.COOKIES_PATH != C.EMPTY:
 			ydl_opts['cookiesfrombrowser'] = C.COOKIES_PATH
 	try:
-		file_path = download_with_yt_dlp(ydl_opts, url, context, update)
+		await context.bot.send_message(chat_id=update.effective_chat.id, text=C.WAIT_MESSAGE)
+		file_path = download_with_yt_dlp(ydl_opts, url)
+		await context.bot.send_message(chat_id=update.effective_chat.id, text=C.DOWNLOAD_COMPLETE_MESSAGE)
 	except DownloadError:
 		log.error(C.ERROR_DOWNLOAD)
 		ydl_opts['format'] = "18"
-		file_path = download_with_yt_dlp(ydl_opts, url, context, update)
+		file_path = download_with_yt_dlp(ydl_opts, url)
+		await context.bot.send_message(chat_id=update.effective_chat.id, text=C.DOWNLOAD_COMPLETE_MESSAGE)
 	except Exception as e:
 		file_path = await download_with_you_get(e, url, context, update)
+		await context.bot.send_message(chat_id=update.effective_chat.id, text=C.DOWNLOAD_COMPLETE_MESSAGE)
 	# todo: check file_path? 
 	await send_media(mode, file_path, context, update)
 
@@ -261,9 +265,7 @@ async def download_with_you_get(e, url, context, update):
 	log.error('Switching to you-get due to Download KO:', str(e))
 	command = ["you-get", "-k", "-f", "-o", path, "-O", C.VIDEO_FILE_NAME, url]
 	log.info(f"you-get -k -f -o {path} -O {C.VIDEO_FILE_NAME} {url}")
-	await context.bot.send_message(chat_id=update.effective_chat.id, text=C.WAIT_MESSAGE)
 	result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-	await context.bot.send_message(chat_id=update.effective_chat.id, text=C.DOWNLOAD_COMPLETE_MESSAGE)
 	if result.returncode == 0:
 		log.info("Command executed successfully!")
 		log.info("Output:")
@@ -290,14 +292,12 @@ def find_file_with_prefix(path):
 	return None
 
 
-async def download_with_yt_dlp(ydl_opts, url, context, update):
-	await context.bot.send_message(chat_id=update.effective_chat.id, text=C.WAIT_MESSAGE)
+def download_with_yt_dlp(ydl_opts, url):
 	with yt_dlp.YoutubeDL(ydl_opts) as ydl:
 		info = ydl.extract_info(url, download=False)
 		file_path = ydl.prepare_filename(info)
 		log.info(f"Downloaded file into {file_path}")
 		ydl.process_info(info)
-		await context.bot.send_message(chat_id=update.effective_chat.id, text=C.DOWNLOAD_COMPLETE_MESSAGE)
 	return file_path
 
 
