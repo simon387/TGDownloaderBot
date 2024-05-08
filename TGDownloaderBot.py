@@ -216,6 +216,8 @@ async def click_callback(update: Update, context: CallbackContext):
 		await context.bot.send_message(chat_id=update.effective_chat.id, text=C.DOWNLOAD_COMPLETE_MESSAGE)
 	if file_path is not None:
 		await send_media(mode, file_path, context, update)
+	else:
+		await context.bot.send_message(chat_id=update.effective_chat.id, text=C.DOWNLOAD_JSON_ERROR)
 
 
 async def send_media(mode, file_path, context, update):

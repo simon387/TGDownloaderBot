@@ -48,6 +48,7 @@ FTP_MESSAGE_START = "Loading file to ftp server because is too big for Telegram"
 ERROR_DOWNLOAD = "Error on download, scaling down format"
 WAIT_MESSAGE = "Wait please..."
 DOWNLOAD_COMPLETE_MESSAGE = "... download completed"
+DOWNLOAD_JSON_ERROR = "Download error!"
 # urls
 
 # var
