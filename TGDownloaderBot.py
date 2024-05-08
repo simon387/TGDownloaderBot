@@ -212,10 +212,10 @@ async def click_callback(update: Update, context: CallbackContext):
 		file_path = download_with_yt_dlp(ydl_opts, url)
 		await context.bot.send_message(chat_id=update.effective_chat.id, text=C.DOWNLOAD_COMPLETE_MESSAGE)
 	except Exception as e:
-		file_path = await download_with_you_get(e, url, context, update)
+		file_path = await download_with_you_get(e, url)
 		await context.bot.send_message(chat_id=update.effective_chat.id, text=C.DOWNLOAD_COMPLETE_MESSAGE)
-	# todo: check file_path? 
-	await send_media(mode, file_path, context, update)
+	if file_path is not None:
+		await send_media(mode, file_path, context, update)
 
 
 async def send_media(mode, file_path, context, update):
@@ -260,7 +260,7 @@ def get_ydl_opts(mode):
 		}
 
 
-async def download_with_you_get(e, url, context, update):
+async def download_with_you_get(e, url):
 	path = C.YOU_GET_DWN_PATH_PREFIX + generate_random_string(16)
 	log.error('Switching to you-get due to Download KO:', str(e))
 	command = ["you-get", "-k", "-f", "-o", path, "-O", C.VIDEO_FILE_NAME, url]

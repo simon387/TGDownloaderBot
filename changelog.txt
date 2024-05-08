@@ -1,3 +1,6 @@
+Version 1.0.40
+- is None check on error
+
 Version 1.0.39
 - fix download bug
 
