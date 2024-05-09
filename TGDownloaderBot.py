@@ -357,7 +357,7 @@ def wait_for_file(directory):
 			log.info("File detected in directory.")
 			return
 		else:
-			log.info("No files detected in directory.")
+			log.info(f"No files detected in directory {directory}")
 		time.sleep(1)  # Adjust the sleep time as needed
 
 
