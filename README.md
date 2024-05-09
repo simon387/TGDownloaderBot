@@ -18,8 +18,9 @@ Theoretically, it could download videos from any webpage, but for now, it only d
 + ```pip install python-telegram-bot[rate-limiter]```
 + ```pip install validators```
 + ```pip install -U yt-dlp```
-+ ```sudo dnf install ffmpeg```
-+ ```pip3 install you-get```
++ ```pip install you-get```
++ ```pip install myjdapi```
++ ```dnf install ffmpeg```
 + Create the ```config.properties``` file in the project's directory, and put this content:
 
 
