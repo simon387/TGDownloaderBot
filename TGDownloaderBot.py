@@ -345,17 +345,19 @@ def delete_files_in_directory(directory):
 		try:
 			if os.path.isfile(file_path):
 				os.remove(file_path)
-				print(f"Deleted {file_path}")
+				log.info(f"Deleted {file_path}")
 		except Exception as e:
-			print(f"Error deleting {file_path}: {e}")
+			log.error(f"Error deleting {file_path}: {e}")
 
 
 def wait_for_file(directory):
 	while True:
 		files = os.listdir(directory)
 		if files:
-			print("File detected in directory.")
+			log.info("File detected in directory.")
 			return
+		else:
+			log.info("No files detected in directory.")
 		time.sleep(1)  # Adjust the sleep time as needed
 
 
