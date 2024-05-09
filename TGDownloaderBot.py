@@ -207,20 +207,19 @@ async def click_callback(update: Update, context: CallbackContext):
 	try:
 		await context.bot.send_message(chat_id=update.effective_chat.id, text=C.WAIT_MESSAGE)
 		file_path = download_with_yt_dlp(ydl_opts, url)
-		await context.bot.send_message(chat_id=update.effective_chat.id, text=C.DOWNLOAD_COMPLETE_MESSAGE)
 	except DownloadError:
 		log.error(C.ERROR_DOWNLOAD)
 		ydl_opts['format'] = "18"
 		file_path = download_with_yt_dlp(ydl_opts, url)
-		await context.bot.send_message(chat_id=update.effective_chat.id, text=C.DOWNLOAD_COMPLETE_MESSAGE)
 	except Exception as e:
 		file_path = await download_with_you_get(e, url)
-		await context.bot.send_message(chat_id=update.effective_chat.id, text=C.DOWNLOAD_COMPLETE_MESSAGE)
 	if file_path is not None:
+		await context.bot.send_message(chat_id=update.effective_chat.id, text=C.DOWNLOAD_COMPLETE_MESSAGE)
 		await send_media(mode, file_path, context, update)
 	else:
 		file_path = download_with_jdownloader(url, mode)
 		if file_path is not None:
+			await context.bot.send_message(chat_id=update.effective_chat.id, text=C.DOWNLOAD_COMPLETE_MESSAGE)
 			await send_media(mode, file_path, context, update)
 		else:
 			await context.bot.send_message(chat_id=update.effective_chat.id, text=C.DOWNLOAD_JSON_ERROR)
