@@ -138,7 +138,7 @@ async def chat_check(update: Update, context: CallbackContext):
 		log_bot_event(update, 'chat_check')
 		msg = update.message.text
 		url = extract_first_url(msg)
-		if url is not None and validators.url(url) and validate(url):
+		if url is not None and validators.url(url) and contains_valid_url(url):
 			await show_download_buttons(update, context, False, url)
 
 
@@ -155,7 +155,7 @@ async def show_download_buttons(update: Update, context: CallbackContext, answer
 	log_bot_event(update, 'download')
 	if msg == C.EMPTY:
 		msg = C.SPACE.join(context.args).strip()
-	if validate(msg):
+	if contains_valid_url(msg):
 		# clean
 		if "https://www.youtube." in msg and "/watch?" in msg:
 			msg = re.sub('&list=.+', C.EMPTY, msg)
@@ -174,7 +174,7 @@ async def show_download_buttons(update: Update, context: CallbackContext, answer
 			await context.bot.send_message(chat_id=update.effective_chat.id, text=C.ERROR_CANT_DOWNLOAD)
 
 
-def validate(msg):
+def contains_valid_url(msg):
 	return is_from_yt(msg) or \
 		"facebook.com/" in msg or \
 		"https://fb.watch/" in msg or \
@@ -192,8 +192,8 @@ def is_from_yt(url):
 		"https://youtu.be/" in url
 
 
-async def click_callback(update: Update, context: CallbackContext):
-	log_bot_event(update, 'click_callback')
+async def download_clicked(update: Update, context: CallbackContext):
+	log_bot_event(update, 'download_clicked')
 	query = update.callback_query
 	mode = query.data
 	url = str(base64.urlsafe_b64decode(query.message.entities[0].url[11:]))[2:-1]
@@ -225,6 +225,67 @@ async def click_callback(update: Update, context: CallbackContext):
 			await context.bot.send_message(chat_id=update.effective_chat.id, text=C.DOWNLOAD_JSON_ERROR)
 
 
+# download method #1
+def download_with_yt_dlp(ydl_opts, url):
+	with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+		info = ydl.extract_info(url, download=False)
+		file_path = ydl.prepare_filename(info)
+		log.info(f"Downloaded file into {file_path}")
+		ydl.process_info(info)
+	return file_path
+
+
+# download method #2
+async def download_with_you_get(e, url):
+	path = C.YOU_GET_DWN_PATH_PREFIX + generate_random_string(16)
+	log.error('Switching to you-get due to Download KO:', str(e))
+	command = ["you-get", "-k", "-f", "-o", path, "-O", C.VIDEO_FILE_NAME, url]
+	log.info(f"you-get -k -f -o {path} -O {C.VIDEO_FILE_NAME} {url}")
+	result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+	if result.returncode == 0:
+		log.info("Command executed successfully!")
+		log.info("Output:")
+		log.info(result.stdout)
+		path_assoluto = os.path.abspath(path)
+		file_path = find_file_with_prefix(path_assoluto)
+		return os.path.join(path, file_path)
+	else:
+		log.error("Error executing command:")
+		log.error(result.stderr)
+	return None
+
+
+# download method #3
+def download_with_jdownloader(url, mode):
+	jd = myjdapi.Myjdapi()
+	jd.set_app_key("EXAMPLE")
+	jd.connect(C.JDOWNLOADER_USER, C.JDOWNLOADER_PASS)
+	jd.update_devices()
+	device = jd.get_device(C.JDOWNLOADER_DEVICE_NAME)
+	#
+	delete_files_in_directory(C.JDOWNLOADER_DOWNLOAD_PATH)
+	#
+	device.linkgrabber.add_links(
+		params=[{
+			"autostart": True,
+			"links": url,
+			"packageName": None,
+			"extractPassword": None,
+			"priority": "DEFAULT",
+			"downloadPassword": None,
+			"destinationFolder": C.JDOWNLOADER_DOWNLOAD_PATH,
+			"overwritePackagizerRules": False
+		}])
+	# wait_for_file
+	wait_for_file(C.JDOWNLOADER_DOWNLOAD_PATH, mode)
+	#
+	if mode == C.MP3:
+		return get_first_file_by_extension(C.JDOWNLOADER_DOWNLOAD_PATH, "mp3")
+	else:
+		return get_first_file_by_extension(C.JDOWNLOADER_DOWNLOAD_PATH, "mp4")
+
+
+# send media to telegram chat
 async def send_media(mode, file_path, context, update):
 	if mode == C.MP3:
 		file_path = f'{file_path[:-4]}.m4a'
@@ -232,13 +293,13 @@ async def send_media(mode, file_path, context, update):
 		try:
 			await context.bot.send_audio(chat_id=update.effective_chat.id, audio=file_path)
 		except TelegramError:
-			await upload_file_ftp(update, context, file_path)
+			await upload_to_ftp(update, context, file_path)
 	else:
 		log.info(f"Sending video file: {file_path}")
 		try:
 			await context.bot.send_video(chat_id=update.effective_chat.id, video=file_path)
 		except TelegramError:
-			await upload_file_ftp(update, context, file_path)
+			await upload_to_ftp(update, context, file_path)
 
 
 def get_ydl_opts(mode):
@@ -267,25 +328,6 @@ def get_ydl_opts(mode):
 		}
 
 
-async def download_with_you_get(e, url):
-	path = C.YOU_GET_DWN_PATH_PREFIX + generate_random_string(16)
-	log.error('Switching to you-get due to Download KO:', str(e))
-	command = ["you-get", "-k", "-f", "-o", path, "-O", C.VIDEO_FILE_NAME, url]
-	log.info(f"you-get -k -f -o {path} -O {C.VIDEO_FILE_NAME} {url}")
-	result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-	if result.returncode == 0:
-		log.info("Command executed successfully!")
-		log.info("Output:")
-		log.info(result.stdout)
-		path_assoluto = os.path.abspath(path)
-		file_path = find_file_with_prefix(path_assoluto)
-		return os.path.join(path, file_path)
-	else:
-		log.error("Error executing command:")
-		log.error(result.stderr)
-	return None
-
-
 def generate_random_string(length):
 	letters = string.ascii_letters
 	return C.EMPTY.join(random.choice(letters) for _ in range(length))
@@ -297,44 +339,6 @@ def find_file_with_prefix(path):
 		if file.startswith(C.VIDEO_FILE_NAME + "."):
 			return file
 	return None
-
-
-def download_with_yt_dlp(ydl_opts, url):
-	with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-		info = ydl.extract_info(url, download=False)
-		file_path = ydl.prepare_filename(info)
-		log.info(f"Downloaded file into {file_path}")
-		ydl.process_info(info)
-	return file_path
-
-
-def download_with_jdownloader(url, mode):
-	jd = myjdapi.Myjdapi()
-	jd.set_app_key("EXAMPLE")
-	jd.connect(C.JDOWNLOADER_USER, C.JDOWNLOADER_PASS)
-	jd.update_devices()
-	device = jd.get_device(C.JDOWNLOADER_DEVICE_NAME)
-	#
-	delete_files_in_directory(C.JDOWNLOADER_DOWNLOAD_PATH)
-	#
-	device.linkgrabber.add_links(
-		params=[{
-			"autostart": True,
-			"links": url,
-			"packageName": None,
-			"extractPassword": None,
-			"priority": "DEFAULT",
-			"downloadPassword": None,
-			"destinationFolder": C.JDOWNLOADER_DOWNLOAD_PATH,
-			"overwritePackagizerRules": False
-		}])
-	# wait_for_file
-	wait_for_file(C.JDOWNLOADER_DOWNLOAD_PATH, mode)
-	#
-	if mode == C.MP3:
-		return get_first_file_by_extension(C.JDOWNLOADER_DOWNLOAD_PATH, "mp3")
-	else:
-		return get_first_file_by_extension(C.JDOWNLOADER_DOWNLOAD_PATH, "mp4")
 
 
 def delete_files_in_directory(directory):
@@ -373,7 +377,7 @@ def get_first_file_by_extension(directory, extension):
 	return None  # Return None if no file with the specified extension is found
 
 
-async def upload_file_ftp(update: Update, context: CallbackContext, local_file_path):
+async def upload_to_ftp(update: Update, context: CallbackContext, local_file_path):
 	await context.bot.send_message(chat_id=update.effective_chat.id, text=C.FTP_MESSAGE_START)
 	ftp = C.EMPTY
 	try:
@@ -405,7 +409,7 @@ if __name__ == '__main__':
 	application.add_handler(CommandHandler('version', send_version))
 	application.add_handler(CommandHandler('shutdown', send_shutdown))
 	application.add_handler(CommandHandler('download', show_download_buttons))
-	application.add_handler(CallbackQueryHandler(click_callback))
+	application.add_handler(CallbackQueryHandler(download_clicked))
 	application.add_handler(MessageHandler(filters.TEXT, chat_check))
 	application.add_error_handler(error_handler)
 	application.run_polling(allowed_updates=Update.ALL_TYPES)
