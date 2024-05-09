@@ -1,3 +1,6 @@
+Version 1.0.46
+- fix download by jdownloader2
+
 Version 1.0.45
 - added logs
 

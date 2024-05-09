@@ -330,7 +330,7 @@ def download_with_jdownloader(url, mode):
 			"overwritePackagizerRules": False
 		}])
 	# wait_for_file
-	wait_for_file(C.JDOWNLOADER_DOWNLOAD_PATH)
+	wait_for_file(C.JDOWNLOADER_DOWNLOAD_PATH, mode)
 	#
 	if mode == C.MP3:
 		return get_first_file_by_extension(C.JDOWNLOADER_DOWNLOAD_PATH, "mp3")
@@ -350,14 +350,20 @@ def delete_files_in_directory(directory):
 			log.error(f"Error deleting {file_path}: {e}")
 
 
-def wait_for_file(directory):
+def wait_for_file(directory, mode):
+	if mode == C.MP3:
+		extension = "mp3"
+	else:
+		extension = "mp4"
 	while True:
-		files = os.listdir(directory)
+		files = [file for file in os.listdir(directory) if file.endswith("." + extension)]
 		if files:
-			log.info("File detected in directory.")
-			return
+			log.info("Files detected in directory:")
+			for file in files:
+				log.info(file)
+			return files
 		else:
-			log.info(f"No files detected in directory {directory}")
+			log.info(f"No {extension.upper()} files detected in directory {directory}")
 		time.sleep(1)  # Adjust the sleep time as needed
 
 

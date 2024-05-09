@@ -13,7 +13,7 @@ but adding the old tokens you saved. This way you can use this between execution
 as long as your tokens are still valid without saving the username and password.
 """
 
-jd.connect("simone.celia@simonecelia.it", "KtjDuV7tW4gEc3y2ssad")
+jd.connect("", "")
 
 # When connecting it gets the devices also, so you can use them but if you want to
 # gather the devices available in my.jdownloader later you can do it like this
@@ -56,7 +56,7 @@ a = device.linkgrabber.add_links(
 		"extractPassword": None,
 		"priority": "DEFAULT",
 		"downloadPassword": None,
-		"destinationFolder": '/home/scelia/jd2/',
+		# "destinationFolder": '/home/scelia/jd2/',
 		"overwritePackagizerRules": False
 	}])
 
