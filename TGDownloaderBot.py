@@ -309,7 +309,7 @@ def download_with_yt_dlp(ydl_opts, url):
 	return file_path
 
 
-async def download_with_jdownloader(url, mode):
+def download_with_jdownloader(url, mode):
 	jd = myjdapi.Myjdapi()
 	jd.set_app_key("EXAMPLE")
 	jd.connect(C.JDOWNLOADER_USER, C.JDOWNLOADER_PASS)
