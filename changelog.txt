@@ -1,3 +1,6 @@
+Version 1.0.42
+- added jDownloader2 support
+
 Version 1.0.41
 - added download path error
 

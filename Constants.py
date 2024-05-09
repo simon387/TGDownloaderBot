@@ -49,7 +49,12 @@ ERROR_DOWNLOAD = "Error on download, scaling down format"
 WAIT_MESSAGE = "Wait please..."
 DOWNLOAD_COMPLETE_MESSAGE = "... download completed"
 DOWNLOAD_JSON_ERROR = "Download error!"
-# urls
+
+# jdownloader
+JDOWNLOADER_DOWNLOAD_PATH = config.get(APPLICATION, "jdownloader.download.path")
+JDOWNLOADER_USER = config.get(APPLICATION, "jdownloader.user")
+JDOWNLOADER_PASS = config.get(APPLICATION, "jdownloader.pass")
+JDOWNLOADER_DEVICE_NAME = config.get(APPLICATION, "jdownloader.device.name")
 
 # var
 SPACE = " "

@@ -45,6 +45,10 @@ ftp.remote.folder=
 youtube.user=
 youtube.pass=
 cookies.path=chrome:~/.config/google-chrome
+jdownloader.download.path=
+jdownloader.user=
+jdownloader.pass=
+jdownloader.device.name=
 ```
 
 ### On gnu/linux, cutting-edge version
@@ -57,7 +61,7 @@ cookies.path=chrome:~/.config/google-chrome
 
 1. ```/setcommands```
 2. ```@TG_DownloaderBot```
-3. Copy paste this:
+3. Copy and paste this:
 
 ```
 version - show bot's version

@@ -10,10 +10,12 @@ import signal
 import string
 import subprocess
 import sys
+import time
 import time as time_os
 import traceback
 from logging.handlers import RotatingFileHandler
 
+import myjdapi
 import telegram
 import validators
 import yt_dlp
@@ -85,7 +87,7 @@ def log_bot_event(update: Update, method_name: str):
 async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
 	# Log the error before we do anything else, so we can see it even if something breaks.
 	log.error(msg="Exception while handling an update:", exc_info=context.error)
-	# No Network, no send message!
+	# No Network, no sent message!
 	if not isinstance(context.error, telegram.error.NetworkError) and not isinstance(context.error, telegram.error.TimedOut):
 		if C.SEND_ERROR_TO_DEV == C.TRUE or C.SEND_ERROR_TO_USER == C.TRUE:
 			# traceback.format_exception returns the usual python message about an exception, but as a
@@ -217,7 +219,11 @@ async def click_callback(update: Update, context: CallbackContext):
 	if file_path is not None:
 		await send_media(mode, file_path, context, update)
 	else:
-		await context.bot.send_message(chat_id=update.effective_chat.id, text=C.DOWNLOAD_JSON_ERROR)
+		file_path = download_with_jdownloader(url, mode)
+		if file_path is not None:
+			await send_media(mode, file_path, context, update)
+		else:
+			await context.bot.send_message(chat_id=update.effective_chat.id, text=C.DOWNLOAD_JSON_ERROR)
 
 
 async def send_media(mode, file_path, context, update):
@@ -301,6 +307,63 @@ def download_with_yt_dlp(ydl_opts, url):
 		log.info(f"Downloaded file into {file_path}")
 		ydl.process_info(info)
 	return file_path
+
+
+async def download_with_jdownloader(url, mode):
+	jd = myjdapi.Myjdapi()
+	jd.set_app_key("EXAMPLE")
+	jd.connect(C.JDOWNLOADER_USER, C.JDOWNLOADER_PASS)
+	jd.update_devices()
+	device = jd.get_device(C.JDOWNLOADER_DEVICE_NAME)
+	#
+	delete_files_in_directory(C.JDOWNLOADER_DOWNLOAD_PATH)
+	#
+	device.linkgrabber.add_links(
+		params=[{
+			"autostart": True,
+			"links": url,
+			"packageName": None,
+			"extractPassword": None,
+			"priority": "DEFAULT",
+			"downloadPassword": None,
+			"destinationFolder": C.JDOWNLOADER_DOWNLOAD_PATH,
+			"overwritePackagizerRules": False
+		}])
+	# wait_for_file
+	wait_for_file(C.JDOWNLOADER_DOWNLOAD_PATH)
+	#
+	if mode == C.MP3:
+		return get_first_file_by_extension(C.JDOWNLOADER_DOWNLOAD_PATH, "mp3")
+	else:
+		return get_first_file_by_extension(C.JDOWNLOADER_DOWNLOAD_PATH, "mp4")
+
+
+def delete_files_in_directory(directory):
+	files = os.listdir(directory)
+	for file_name in files:
+		file_path = os.path.join(directory, file_name)
+		try:
+			if os.path.isfile(file_path):
+				os.remove(file_path)
+				print(f"Deleted {file_path}")
+		except Exception as e:
+			print(f"Error deleting {file_path}: {e}")
+
+
+def wait_for_file(directory):
+	while True:
+		files = os.listdir(directory)
+		if files:
+			print("File detected in directory.")
+			return
+		time.sleep(1)  # Adjust the sleep time as needed
+
+
+def get_first_file_by_extension(directory, extension):
+	for file_name in os.listdir(directory):
+		if file_name.endswith(extension):
+			return os.path.join(directory, file_name)
+	return None  # Return None if no file with the specified extension is found
 
 
 async def upload_file_ftp(update: Update, context: CallbackContext, local_file_path):
