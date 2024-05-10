@@ -23,6 +23,7 @@ Theoretically, it could download videos from any webpage, but for now, it only d
 + ```dnf install ffmpeg```
 + Create the ```config.properties``` file in the project's directory, and put this content:
 
+**If you want to use the jDownloader2 integration function, you have to setup the remote control!**
 
 ```
 [secrets]
