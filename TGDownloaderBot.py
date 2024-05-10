@@ -192,6 +192,7 @@ def is_from_yt(url):
 		"https://youtu.be/" in url
 
 
+# this is the core of the business logic
 async def download_clicked(update: Update, context: CallbackContext):
 	log_bot_event(update, 'download_clicked')
 	query = update.callback_query
@@ -199,25 +200,25 @@ async def download_clicked(update: Update, context: CallbackContext):
 	url = str(base64.urlsafe_b64decode(query.message.entities[0].url[11:]))[2:-1]
 	await query.answer(f'selected: download from {url}')
 	ydl_opts = get_ydl_opts(mode)
-	if is_from_yt(url):
+	if is_from_yt(url):  # if is from YouTube, attemp login
 		ydl_opts['username'] = C.YOUTUBE_USER
 		ydl_opts['password'] = C.YOUTUBE_PASS
 		if C.COOKIES_PATH != C.EMPTY:
 			ydl_opts['cookiesfrombrowser'] = C.COOKIES_PATH
 	try:
 		await context.bot.send_message(chat_id=update.effective_chat.id, text=C.WAIT_MESSAGE)
-		file_path = download_with_yt_dlp(ydl_opts, url)
+		file_path = download_with_yt_dlp(ydl_opts, url)  # this is the first download try, using yt_dlp
 	except DownloadError:
 		log.error(C.ERROR_DOWNLOAD)
 		ydl_opts['format'] = "18"
-		file_path = download_with_yt_dlp(ydl_opts, url)
+		file_path = download_with_yt_dlp(ydl_opts, url)  # if it fails, use yt_dlp with another format, second try
 	except Exception as e:
-		file_path = await download_with_you_get(e, url)
+		file_path = await download_with_you_get(e, url)  # if it still fails, the 3# try is with you_get
 	if file_path is not None:
 		await context.bot.send_message(chat_id=update.effective_chat.id, text=C.DOWNLOAD_COMPLETE_MESSAGE)
 		await send_media(mode, file_path, context, update)
 	else:
-		file_path = download_with_jdownloader(url, mode)
+		file_path = download_with_jdownloader(url, mode)  # if something fails again, the 4# try is with the jDownloader2 integration
 		if file_path is not None:
 			await context.bot.send_message(chat_id=update.effective_chat.id, text=C.DOWNLOAD_COMPLETE_MESSAGE)
 			await send_media(mode, file_path, context, update)
@@ -273,7 +274,7 @@ def download_with_jdownloader(url, mode):
 			"extractPassword": None,
 			"priority": "DEFAULT",
 			"downloadPassword": None,
-			"destinationFolder": C.JDOWNLOADER_DOWNLOAD_PATH,
+			"destinationFolder": C.JDOWNLOADER_DOWNLOAD_PATH,  # TODO For accuracy, it's better to dynamically change this line for concurrence
 			"overwritePackagizerRules": False
 		}])
 	# wait_for_file
@@ -396,6 +397,7 @@ async def upload_to_ftp(update: Update, context: CallbackContext, local_file_pat
 		ftp.quit()
 
 
+# application's setup
 if __name__ == '__main__':
 	application = ApplicationBuilder() \
 		.token(C.TOKEN) \

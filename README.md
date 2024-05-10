@@ -23,7 +23,7 @@ Theoretically, it could download videos from any webpage, but for now, it only d
 + ```dnf install ffmpeg```
 + Create the ```config.properties``` file in the project's directory, and put this content:
 
-**If you want to use the jDownloader2 integration function, you have to setup the remote control!**
+**If you want to use the jDownloader2 integration function, you have to set up the remote control!**
 
 ```
 [secrets]
@@ -75,7 +75,7 @@ shutdown - shutdown the bot
 
 Done! Congratulations on your new bot. You will find it at t.me/TG_DownloaderBot. You can now add a description, about section
 and profile picture for your bot, see /help for a list of commands. By the way, when you've finished creating your cool
-bot, ping our Bot Support if you want a better username for it. Just make sure the bot is fully operational before you
+bot, ping our Bot Support if you want a better username for it. Make sure the bot is fully operational before you
 do this.
 
 Use this token to access the HTTP API:

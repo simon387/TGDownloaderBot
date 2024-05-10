@@ -1,3 +1,8 @@
+Version 1.0.49
+- added some comments on code
+- fix readme's typos
+- fix changelog's typos
+
 Version 1.0.48
 - code refactoring
 
@@ -50,7 +55,7 @@ Version 1.0.33
 - added download message
 
 Version 1.0.32
-- fix await error bug
+- fix awaits error bug
 
 Version 1.0.31
 - code refactoring
@@ -97,7 +102,7 @@ Version 1.0.18
 
 Version 1.0.17
 - added reply to specific message
-- added instruction on linux for more updated ytdl library
+- added instruction on linux for a more updated ytdl library
 
 Version 1.0.16
 - added send to dev flag
@@ -106,7 +111,7 @@ Version 1.0.15
 - intercepts not perfect url function
 
 Version 1.0.14
-- added first support for youtube login, by user + pass and by cookies
+- added first support for YouTube login, by user + pass and by cookies
 
 Version 1.0.13
 - better bug report function
@@ -129,7 +134,7 @@ Version 1.0.8
 
 Version 1.0.7
 - refactor constants file name1.
-- added filter on youtube
+- added filter on YouTube
 
 Version 1.0.6
 - changed download default directory
@@ -139,7 +144,7 @@ Version 1.0.5
 - changed log file name
 
 Version 1.0.4
-- fixed youtube shorts download
+- fixed YouTube shorts download
 
 Version 1.0.3
 - added LICENSE
