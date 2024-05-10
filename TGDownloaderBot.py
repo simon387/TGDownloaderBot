@@ -281,9 +281,9 @@ def download_with_jdownloader(url, mode):
 	wait_for_file(C.JDOWNLOADER_DOWNLOAD_PATH, mode)
 	#
 	if mode == C.MP3:
-		return get_first_file_by_extension(C.JDOWNLOADER_DOWNLOAD_PATH, "mp3")
+		return get_first_file_by_extension(C.JDOWNLOADER_DOWNLOAD_PATH, C.MP3_EXTENSION)
 	else:
-		return get_first_file_by_extension(C.JDOWNLOADER_DOWNLOAD_PATH, "mp4")
+		return get_first_file_by_extension(C.JDOWNLOADER_DOWNLOAD_PATH, C.MP4_EXTENSION)
 
 
 # send media to telegram chat
@@ -356,9 +356,9 @@ def delete_files_in_directory(directory):
 
 def wait_for_file(directory, mode):
 	if mode == C.MP3:
-		extension = "mp3"
+		extension = C.MP3_EXTENSION
 	else:
-		extension = "mp4"
+		extension = C.MP4_EXTENSION
 	while True:
 		files = [file for file in os.listdir(directory) if file.endswith("." + extension)]
 		if files:
