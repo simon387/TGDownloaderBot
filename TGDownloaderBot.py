@@ -227,6 +227,7 @@ async def download_clicked(update: Update, context: CallbackContext):
 
 
 # download method #1
+# @return file_path
 def download_with_yt_dlp(ydl_opts, url):
 	with yt_dlp.YoutubeDL(ydl_opts) as ydl:
 		info = ydl.extract_info(url, download=False)
@@ -237,6 +238,7 @@ def download_with_yt_dlp(ydl_opts, url):
 
 
 # download method #2
+# @return file_path
 async def download_with_you_get(e, url):
 	path = C.YOU_GET_DWN_PATH_PREFIX + generate_random_string(16)
 	log.error('Switching to you-get due to Download KO:', str(e))
@@ -257,6 +259,7 @@ async def download_with_you_get(e, url):
 
 
 # download method #3
+# @return file_path
 def download_with_jdownloader(url, mode):
 	jd = myjdapi.Myjdapi()
 	jd.set_app_key("EXAMPLE")
