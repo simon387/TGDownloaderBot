@@ -306,7 +306,7 @@ async def send_media(mode, file_path, context, update):
 			await upload_to_ftp(update, context, file_path)
 
 
-def get_ydl_opts(mode):
+def get_ydl_opts(mode):  # return just the configuration json for ydl application
 	paths = {
 		'home': 'download'
 	}
@@ -333,21 +333,18 @@ def get_ydl_opts(mode):
 
 
 def generate_random_string(length):
-	letters = string.ascii_letters
-	return C.EMPTY.join(random.choice(letters) for _ in range(length))
+	return C.EMPTY.join(random.choice(string.ascii_letters) for _ in range(length))
 
 
 def find_file_with_prefix(path):
-	files = os.listdir(path)
-	for file in files:
+	for file in os.listdir(path):
 		if file.startswith(C.VIDEO_FILE_NAME + "."):
 			return file
 	return None
 
 
 def delete_files_in_directory(directory):
-	files = os.listdir(directory)
-	for file_name in files:
+	for file_name in os.listdir(directory):
 		file_path = os.path.join(directory, file_name)
 		try:
 			if os.path.isfile(file_path):
@@ -358,10 +355,9 @@ def delete_files_in_directory(directory):
 
 
 def wait_for_file(directory, mode):
+	extension = C.MP4_EXTENSION
 	if mode == C.MP3:
 		extension = C.MP3_EXTENSION
-	else:
-		extension = C.MP4_EXTENSION
 	while True:
 		files = [file for file in os.listdir(directory) if file.endswith("." + extension)]
 		if files:
