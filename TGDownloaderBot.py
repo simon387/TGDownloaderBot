@@ -156,9 +156,8 @@ async def show_download_buttons(update: Update, context: CallbackContext, answer
 	if msg == C.EMPTY:
 		msg = C.SPACE.join(context.args).strip()
 	if contains_valid_url(msg):
-		# clean
 		if "https://www.youtube." in msg and "/watch?" in msg:
-			msg = re.sub('&list=.+', C.EMPTY, msg)
+			msg = re.sub('&list=.+', C.EMPTY, msg)  # clean link
 		#
 		keyboard = [
 			[
@@ -229,6 +228,7 @@ async def download_clicked(update: Update, context: CallbackContext):
 # download method #1
 # @return file_path
 def download_with_yt_dlp(ydl_opts, url):
+	log.info("Using download method #1")
 	with yt_dlp.YoutubeDL(ydl_opts) as ydl:
 		info = ydl.extract_info(url, download=False)
 		file_path = ydl.prepare_filename(info)
@@ -240,6 +240,7 @@ def download_with_yt_dlp(ydl_opts, url):
 # download method #2
 # @return file_path
 async def download_with_you_get(e, url):
+	log.info("Using download method #2")
 	path = C.YOU_GET_DWN_PATH_PREFIX + generate_random_string(16)
 	log.error('Switching to you-get due to Download KO:', str(e))
 	command = ["you-get", "-k", "-f", "-o", path, "-O", C.VIDEO_FILE_NAME, url]
@@ -261,6 +262,7 @@ async def download_with_you_get(e, url):
 # download method #3
 # @return file_path
 def download_with_jdownloader(url, mode):
+	log.info("Using download method #3")
 	jd = myjdapi.Myjdapi()
 	jd.set_app_key("EXAMPLE")
 	jd.connect(C.JDOWNLOADER_USER, C.JDOWNLOADER_PASS)
