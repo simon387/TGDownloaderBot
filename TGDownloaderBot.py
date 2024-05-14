@@ -380,6 +380,7 @@ def get_first_file_by_extension(directory, extension):
 
 
 async def upload_to_ftp(update: Update, context: CallbackContext, local_file_path):
+	log.info(C.FTP_MESSAGE_START)
 	await context.bot.send_message(chat_id=update.effective_chat.id, text=C.FTP_MESSAGE_START)
 	ftp = C.EMPTY
 	try:
