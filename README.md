@@ -14,6 +14,8 @@ Theoretically, it could download videos from any webpage, but for now, it only d
 
 ## Dev's Setup
 
+**If you want to use the jDownloader2 integration function, you have to set up the remote control!**
+
 + ```pip install python-telegram-bot --upgrade``` or ```pip install python-telegram-bot -U --pre```
 + ```pip install python-telegram-bot[rate-limiter]```
 + ```pip install validators```
@@ -22,8 +24,6 @@ Theoretically, it could download videos from any webpage, but for now, it only d
 + ```pip install myjdapi```
 + ```dnf install ffmpeg```
 + Create the ```config.properties``` file in the project's directory, and put this content:
-
-**If you want to use the jDownloader2 integration function, you have to set up the remote control!**
 
 ```
 [secrets]
