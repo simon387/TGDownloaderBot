@@ -271,7 +271,7 @@ def download_with_jdownloader(url, mode):
 	#
 	delete_files_in_directory(C.JDOWNLOADER_DOWNLOAD_PATH)
 	#
-	device.linkgrabber.add_links(
+	response_links = device.linkgrabber.add_links(
 		params=[{
 			"autostart": True,
 			"links": url,
@@ -280,8 +280,28 @@ def download_with_jdownloader(url, mode):
 			"priority": "DEFAULT",
 			"downloadPassword": None,
 			"destinationFolder": C.JDOWNLOADER_DOWNLOAD_PATH,  # TODO For accuracy, it's better to dynamically change this line for concurrence
-			"overwritePackagizerRules": False
+			"overwritePackagizerRules": True  # was False
 		}])
+	#
+	device.downloads.query_packages([{  # not used for now
+		"bytesLoaded": True,
+		"bytesTotal": True,
+		"comment": False,
+		"enabled": True,
+		"eta": True,
+		"priority": False,
+		"finished": True,
+		"running": True,
+		"speed": True,
+		"status": True,
+		"childCount": True,
+		"hosts": True,
+		"saveTo": True,
+		"maxResults": -1,
+		"startAt": 0,
+	}])
+	#
+	device.downloads.force_download(response_links.id, 0)
 	# wait_for_file
 	wait_for_file(C.JDOWNLOADER_DOWNLOAD_PATH, mode)
 	#
@@ -388,7 +408,8 @@ async def upload_to_ftp(update: Update, context: CallbackContext, local_file_pat
 		ftp.login(C.FTP_USER, C.FTP_PASS)
 		ftp.cwd(C.FTP_REMOTE_FOLDER)
 		with open(local_file_path, 'rb') as file:
-			remote_file = re.sub(r"\s+", "_", local_file_path.replace('download\\', C.EMPTY).replace('download/', C.EMPTY))
+			# remote_file = re.sub(r"\s+", "_", local_file_path.replace('download\\', C.EMPTY).replace('download/', C.EMPTY))
+			remote_file = os.path.basename(local_file_path)
 			ftp.storbinary('STOR ' + remote_file, file)
 		log.info('Upload OK')
 		await context.bot.send_message(chat_id=update.effective_chat.id, text=C.FTP_MESSAGE_OK + C.FTP_URL + remote_file)
