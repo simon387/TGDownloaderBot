@@ -283,25 +283,25 @@ def download_with_jdownloader(url, mode):
 			"overwritePackagizerRules": True  # was False
 		}])
 	#
-	device.downloads.query_packages([{  # not used for now
-		"bytesLoaded": True,
-		"bytesTotal": True,
-		"comment": False,
-		"enabled": True,
-		"eta": True,
-		"priority": False,
-		"finished": True,
-		"running": True,
-		"speed": True,
-		"status": True,
-		"childCount": True,
-		"hosts": True,
-		"saveTo": True,
-		"maxResults": -1,
-		"startAt": 0,
-	}])
+	#device.downloads.query_packages([{  # not used for now
+#		"bytesLoaded": True,
+#		"bytesTotal": True,
+#		"comment": False,
+#		"enabled": True,
+#		"eta": True,
+#		"priority": False,
+#		"finished": True,
+#		"running": True,
+##		"speed": True,
+#		"status": True,
+#		"childCount": True,
+#		"hosts": True,
+####		"saveTo": True,
+	#	"maxResults": -1,
+	#	"startAt": 0,
+	#}])
 	#
-	device.downloads.force_download(response_links.id, 0)
+	# device.downloads.force_download(response_links, 0)
 	# wait_for_file
 	wait_for_file(C.JDOWNLOADER_DOWNLOAD_PATH, mode)
 	#
