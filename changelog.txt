@@ -1,3 +1,6 @@
+Version 1.0.57
+- code cleaning
+
 Version 1.0.56
 - better force download for download method with jDownloader2
 - update ftp function
