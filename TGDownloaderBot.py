@@ -340,7 +340,7 @@ def generate_random_string(length):
 
 def find_file_with_prefix(path):
 	for file in os.listdir(path):
-		if file.startswith(C.VIDEO_FILE_NAME + "."):
+		if file.startswith(C.VIDEO_FILE_NAME + C.POINT):
 			return file
 	return None
 
@@ -361,7 +361,7 @@ def wait_for_file(directory, mode):
 	if mode == C.MP3:
 		extension = C.MP3_EXTENSION
 	while True:
-		files = [file for file in os.listdir(directory) if file.endswith("." + extension)]
+		files = [file for file in os.listdir(directory) if file.endswith(C.POINT + extension)]
 		if files:
 			log.info("Files detected in directory:")
 			for file in files:
@@ -390,10 +390,10 @@ async def upload_to_ftp(update: Update, context: CallbackContext, local_file_pat
 		with open(local_file_path, 'rb') as file:
 			remote_file = re.sub(r"\s+", "_", local_file_path.replace('download\\', C.EMPTY).replace('download/', C.EMPTY))
 			ftp.storbinary('STOR ' + remote_file, file)
-		log.info('Upload ok')
+		log.info('Upload OK')
 		await context.bot.send_message(chat_id=update.effective_chat.id, text=C.FTP_MESSAGE_OK + C.FTP_URL + remote_file)
 	except ftplib.all_errors as e:
-		log.info('Upload ko:', str(e))
+		log.info('Upload KO:', str(e))
 		await context.bot.send_message(chat_id=update.effective_chat.id, text=C.ERROR_UPLOAD + str(e))
 	finally:
 		ftp.quit()

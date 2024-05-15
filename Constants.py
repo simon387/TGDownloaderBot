@@ -59,6 +59,7 @@ JDOWNLOADER_DEVICE_NAME = config.get(APPLICATION, "jdownloader.device.name")
 # var
 SPACE = " "
 EMPTY = ""
+POINT = "."
 MP3 = "MP3"
 MP4 = "MP4"
 TRUE = "true"
