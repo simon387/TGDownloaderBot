@@ -17,9 +17,9 @@ def download_with_jdownloader(url, mode):
 	jd.update_devices()
 	device = jd.get_device(C.JDOWNLOADER_DEVICE_NAME)
 	#
-	delete_files_in_directory(C.JDOWNLOADER_DOWNLOAD_PATH)
+	# delete_files_in_directory(C.JDOWNLOADER_DOWNLOAD_PATH)  # TODO we don't delete anymore
 	#
-	tmp = device.linkgrabber.add_links(
+	device.linkgrabber.add_links(
 		params=[{
 			"autostart": True,
 			"links": url,
@@ -27,57 +27,40 @@ def download_with_jdownloader(url, mode):
 			"extractPassword": None,
 			"priority": "DEFAULT",
 			"downloadPassword": None,
-			"destinationFolder": C.JDOWNLOADER_DOWNLOAD_PATH,  # TODO For accuracy, it's better to dynamically change this line for concurrence
+			"destinationFolder": C.JDOWNLOADER_DOWNLOAD_PATH,
 			"overwritePackagizerRules": True  # was False
 		}])
-
-	tmp2 = device.downloads.query_links()
-	#params=[{
-	#	"addedDate": True,
-	#	"bytesLoaded": True,
-	#	"bytesTotal": True,
-	#	"comment": True,
-	#	"enabled": True,
-	#	"eta": True,
-	#	"extractionStatus": True,
-	#	"finished": True,
-	#	"finishedDate": True,
-	#	"host": True,
-	#	"jobUUIDs": [],
-	#	"maxResults": -1,
-	#	"packageUUIDs": [],
-	#	"password": True,
-	#	"priority": True,
-	#	"running": True,
-	#	"skipped": True,
-	#	"speed": True,
-	#	"startAt": 0,
-	#	"status": True,
-	#	"url": True
-	#}])
 	#
-	name = ""
-	for e in tmp2:
-		if e['url'] == url:
-			name = e['name']
-	# wait_for_file
-	wait_for_file(C.JDOWNLOADER_DOWNLOAD_PATH, name, mode, 1)
+	links = device.downloads.query_links()
 	#
-	if mode == C.MP3:
-		return get_first_file_by_extension(C.JDOWNLOADER_DOWNLOAD_PATH, C.MP3_EXTENSION)
-	else:
-		return get_first_file_by_extension(C.JDOWNLOADER_DOWNLOAD_PATH, C.MP4_EXTENSION)
+	filename = C.EMPTY
+	for link in links:
+		if link['url'] == url:
+			filename = link['name']
+			break
+	if filename == C.EMPTY:
+		log.error("Something went wrong!")
+		return None
+	#
+	# wait for file being downloaded
+	wait_for_file(C.JDOWNLOADER_DOWNLOAD_PATH, filename, mode, 1)
+	#
+	# if mode == C.MP3:
+	# 	return get_first_file_by_extension(C.JDOWNLOADER_DOWNLOAD_PATH, C.MP3_EXTENSION)
+	# else:
+	# 	return get_first_file_by_extension(, C.MP4_EXTENSION)
+	return os.path.join(C.JDOWNLOADER_DOWNLOAD_PATH, filename)
 
 
-def delete_files_in_directory(directory):
-	for file_name in os.listdir(directory):
-		file_path = os.path.join(directory, file_name)
-		try:
-			if os.path.isfile(file_path):
-				os.remove(file_path)
-				log.info(f"Deleted {file_path}")
-		except Exception as e:
-			log.error(f"Error deleting {file_path}: {e}")
+# def delete_files_in_directory(directory):
+# 	for file_name in os.listdir(directory):
+# 		file_path = os.path.join(directory, file_name)
+# 		try:
+# 			if os.path.isfile(file_path):
+# 				os.remove(file_path)
+# 				log.info(f"Deleted {file_path}")
+# 		except Exception as e:
+# 			log.error(f"Error deleting {file_path}: {e}")
 
 
 def wait_for_file(directory, name, mode, secs):
@@ -90,15 +73,15 @@ def wait_for_file(directory, name, mode, secs):
 			log.info(f"Files detected in directory {directory}:")
 			for file in files:
 				log.info(file)
-				if name in file:
+				if name[:-4] in file:
 					return
 		else:
 			log.info(f"No {extension.upper()} files detected in directory {directory}")
 		time.sleep(secs)
 
 
-def get_first_file_by_extension(directory, extension):
-	for file_name in os.listdir(directory):
-		if file_name.endswith(extension):
-			return os.path.join(directory, file_name)
-	return None  # Return None if no file with the specified extension is found
+# def get_first_file_by_extension(directory, extension):
+# 	for file_name in os.listdir(directory):
+# 		if file_name.endswith(extension):
+# 			return os.path.join(directory, file_name)
+# 	return None  # Return None if no file with the specified extension is found

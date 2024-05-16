@@ -63,3 +63,29 @@ a = device.linkgrabber.add_links(
 # device.downloads.set_dl_location(directory='/home/scelia/Scaricati/')
 #
 # device.downloads.force_download(link_ids=a.id)
+
+tmp2 = device.downloads.query_links()
+#params=[{
+#	"addedDate": True,
+#	"bytesLoaded": True,
+#	"bytesTotal": True,
+#	"comment": True,
+#	"enabled": True,
+#	"eta": True,
+#	"extractionStatus": True,
+#	"finished": True,
+#	"finishedDate": True,
+#	"host": True,
+#	"jobUUIDs": [],
+#	"maxResults": -1,
+#	"packageUUIDs": [],
+#	"password": True,
+#	"priority": True,
+#	"running": True,
+#	"skipped": True,
+#	"speed": True,
+#	"startAt": 0,
+#	"status": True,
+#	"url": True
+#}])
+#
