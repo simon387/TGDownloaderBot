@@ -1,6 +1,6 @@
 import os
 
-import Constants as C  ## config.read("../config.properties")
+from src.util import Constants as C
 import ftplib
 import re
 

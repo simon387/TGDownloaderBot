@@ -1,34 +1,30 @@
 import base64
-import ftplib
-import html
-import json
 import logging as log
 import os
 import random
 import re
-import signal
 import string
 import subprocess
-import sys
 import time
-import time as time_os
-import traceback
 from logging.handlers import RotatingFileHandler
 
 import myjdapi
-import telegram
 import validators
 import yt_dlp
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.constants import ParseMode
 from telegram.error import TelegramError
-from telegram.ext import ApplicationBuilder, CallbackContext, CommandHandler, ContextTypes, Application, AIORateLimiter, CallbackQueryHandler, MessageHandler, \
+from telegram.ext import ApplicationBuilder, CallbackContext, CommandHandler, AIORateLimiter, CallbackQueryHandler, MessageHandler, \
 	filters
 # noinspection PyProtectedMember
 from yt_dlp import DownloadError
 
-import Constants as C
-from BotApp import BotApp
+from src.override.BotApp import BotApp
+from src.service.error_service import error_handler
+from src.service.ftp_service import upload_to_ftp
+from src.service.log_service import log_bot_event, post_init, post_shutdown, send_version
+from src.service.shutdown_service import send_shutdown
+from src.util import Constants as C
 
 log.basicConfig(
 	handlers=[
@@ -45,92 +41,6 @@ log.basicConfig(
 
 if C.LOG_LEVEL <= log.INFO:
 	log.getLogger('httpx').setLevel(log.WARNING)
-
-
-async def send_version(update: Update, context: CallbackContext):
-	log_bot_event(update, 'send_version')
-	await context.bot.send_message(chat_id=update.effective_chat.id, text=get_version() + C.VERSION_MESSAGE)
-
-
-async def send_shutdown(update: Update, context: CallbackContext):
-	log_bot_event(update, 'send_shutdown')
-	if update.effective_user.id == int(C.TELEGRAM_DEVELOPER_CHAT_ID):
-		os.kill(os.getpid(), signal.SIGINT)
-	else:
-		await context.bot.send_message(chat_id=update.effective_chat.id, text=C.ERROR_NO_GRANT_SHUTDOWN)
-
-
-async def post_init(app: Application):
-	version = get_version()
-	log.info(f"Starting TGDownloaderBot, {version}")
-	if C.SEND_START_AND_STOP_MESSAGE == C.TRUE:
-		await app.bot.send_message(chat_id=C.TELEGRAM_GROUP_ID, text=C.STARTUP_MESSAGE + version, parse_mode=ParseMode.HTML)
-		await app.bot.send_message(chat_id=C.TELEGRAM_DEVELOPER_CHAT_ID, text=C.STARTUP_MESSAGE + version, parse_mode=ParseMode.HTML)
-
-
-# noinspection PyUnusedLocal
-async def post_shutdown(app: Application):
-	log.info(f"Shutting down the bot")
-
-
-# v1.0, highest but custom
-def log_bot_event(update: Update, method_name: str):
-	msg = 'No message, just a click'
-	if update.message is not None:
-		msg = update.message.text
-	user = update.effective_user.first_name
-	uid = update.effective_user.id
-	log.info(f"[method={method_name}] Got this message from {user} [id={str(uid)}]: {msg}")
-
-
-# Log the error and send a telegram message to notify the developer. Attemp to restart the bot too
-async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
-	# Log the error before we do anything else, so we can see it even if something breaks.
-	log.error(msg="Exception while handling an update:", exc_info=context.error)
-	# No Network, no sent message!
-	if not isinstance(context.error, telegram.error.NetworkError) and not isinstance(context.error, telegram.error.TimedOut):
-		if C.SEND_ERROR_TO_DEV == C.TRUE or C.SEND_ERROR_TO_USER == C.TRUE:
-			# traceback.format_exception returns the usual python message about an exception, but as a
-			# list of strings rather than a single string, so we have to join them together.
-			tb_list = traceback.format_exception(None, context.error, context.error.__traceback__)
-			tb_string = C.EMPTY.join(tb_list)
-			# Build the message with some markup and additional information about what happened.
-			update_str = update.to_dict() if isinstance(update, Update) else str(update)
-			await context.bot.send_message(chat_id=C.TELEGRAM_DEVELOPER_CHAT_ID, text=f"An exception was raised while handling an update")
-			if update_str != C.NONE:
-				await send_error_message(update, context, f"{C.PRE}update = {html.escape(json.dumps(update_str, indent=2, ensure_ascii=False))}{C.PRC}")
-			if context.chat_data != {}:
-				await send_error_message(update, context, f"{C.PRE}context.chat_data = {html.escape(str(context.chat_data))}{C.PRC}")
-			if context.user_data != {}:
-				await send_error_message(update, context, f"{C.PRE}context.user_data = {html.escape(str(context.user_data))}{C.PRC}")
-			await send_error_message(update, context, f"{C.PRE}{html.escape(tb_string)}{C.PRC}")
-	# Restart the bot
-	if C.RESTART_FLAG == C.TRUE:
-		time_os.sleep(5.0)
-		os.execl(sys.executable, sys.executable, *sys.argv)
-
-
-async def send_error_message(update: Update, context: ContextTypes.DEFAULT_TYPE, message):
-	max_length = 4096  # Maximum allowed length for a message
-	chunks = [message[i:i + max_length] for i in range(0, len(message), max_length)]
-	# Send each chunk as a separate message
-	for chunk in chunks:
-		if not chunk.startswith(C.PRE):
-			chunk = C.PRE + chunk
-		if not chunk.endswith(C.PRC):
-			chunk += C.PRC
-		# Finally, send the message
-		if C.SEND_ERROR_TO_DEV == C.TRUE:
-			await context.bot.send_message(chat_id=C.TELEGRAM_DEVELOPER_CHAT_ID, text=chunk, parse_mode=ParseMode.HTML)
-		if C.SEND_ERROR_TO_USER == C.TRUE and update is not None:
-			if update.effective_chat.id:
-				await context.bot.send_message(chat_id=update.effective_chat.id, text=chunk, parse_mode=ParseMode.HTML)
-
-
-def get_version():
-	with open("changelog.txt") as f:
-		firstline = f.readline().rstrip()
-	return firstline
 
 
 async def chat_check(update: Update, context: CallbackContext):
@@ -379,26 +289,6 @@ def get_first_file_by_extension(directory, extension):
 		if file_name.endswith(extension):
 			return os.path.join(directory, file_name)
 	return None  # Return None if no file with the specified extension is found
-
-
-async def upload_to_ftp(update: Update, context: CallbackContext, local_file_path):
-	log.info(f"{C.FTP_MESSAGE_START} local_file_path={local_file_path}")
-	await context.bot.send_message(chat_id=update.effective_chat.id, text=C.FTP_MESSAGE_START)
-	ftp = C.EMPTY
-	try:
-		ftp = ftplib.FTP(C.FTP_HOST)
-		ftp.login(C.FTP_USER, C.FTP_PASS)
-		ftp.cwd(C.FTP_REMOTE_FOLDER)
-		with open(local_file_path, 'rb') as file:
-			remote_file = os.path.basename(local_file_path)
-			ftp.storbinary('STOR ' + remote_file, file)
-		log.info('Upload OK')
-		await context.bot.send_message(chat_id=update.effective_chat.id, text=C.FTP_MESSAGE_OK + C.FTP_URL + remote_file)
-	except ftplib.all_errors as e:
-		log.info('Upload KO:', str(e))
-		await context.bot.send_message(chat_id=update.effective_chat.id, text=C.ERROR_UPLOAD + str(e))
-	finally:
-		ftp.quit()
 
 
 # application's setup

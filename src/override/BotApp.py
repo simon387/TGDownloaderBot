@@ -1,6 +1,6 @@
 from telegram.constants import ParseMode
 from telegram.ext import Application
-import Constants
+from src.util import Constants
 
 
 # Override App Class
