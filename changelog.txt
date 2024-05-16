@@ -1,3 +1,7 @@
+Version 1.0.66
+- added logs
+- clean code
+
 Version 1.0.65
 - fix jDownloader2 integration
 

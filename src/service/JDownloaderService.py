@@ -17,8 +17,6 @@ def download_with_jdownloader(url, mode):
 	jd.update_devices()
 	device = jd.get_device(C.JDOWNLOADER_DEVICE_NAME)
 	#
-	# delete_files_in_directory(C.JDOWNLOADER_DOWNLOAD_PATH)  # TODO we don't delete anymore
-	#
 	device.linkgrabber.add_links(
 		params=[{
 			"autostart": True,
@@ -31,39 +29,27 @@ def download_with_jdownloader(url, mode):
 			"overwritePackagizerRules": True  # was False
 		}])
 	#
+	# wait for jDownloader link interceptor
 	links = device.downloads.query_links()
 	while not links:
 		links = device.downloads.query_links()
+		log.info("Waiting for links...")
 		time.sleep(2)
 	#
 	filename = C.EMPTY
 	for link in links:
 		if link['url'] == url:
 			filename = link['name']
+			log.info("Filename found!")
 			break
 	if filename == C.EMPTY:
-		log.error("Something went wrong!")
+		log.error("Something went wrong! No filename found")
 		return None
 	#
 	# wait for file being downloaded
 	wait_for_file(C.JDOWNLOADER_DOWNLOAD_PATH, filename, mode, 1)
 	#
-	# if mode == C.MP3:
-	# 	return get_first_file_by_extension(C.JDOWNLOADER_DOWNLOAD_PATH, C.MP3_EXTENSION)
-	# else:
-	# 	return get_first_file_by_extension(, C.MP4_EXTENSION)
 	return os.path.join(C.JDOWNLOADER_DOWNLOAD_PATH, filename)
-
-
-# def delete_files_in_directory(directory):
-# 	for file_name in os.listdir(directory):
-# 		file_path = os.path.join(directory, file_name)
-# 		try:
-# 			if os.path.isfile(file_path):
-# 				os.remove(file_path)
-# 				log.info(f"Deleted {file_path}")
-# 		except Exception as e:
-# 			log.error(f"Error deleting {file_path}: {e}")
 
 
 def wait_for_file(directory, name, mode, secs):
@@ -76,15 +62,8 @@ def wait_for_file(directory, name, mode, secs):
 			log.info(f"Files detected in directory {directory}:")
 			for file in files:
 				log.info(file)
-				if name[:-4] + "." + extension in file:
+				if name[:-4] + C.POINT + extension in file:
 					return
 		else:
 			log.info(f"No {extension.upper()} files detected in directory {directory}")
 		time.sleep(secs)
-
-
-# def get_first_file_by_extension(directory, extension):
-# 	for file_name in os.listdir(directory):
-# 		if file_name.endswith(extension):
-# 			return os.path.join(directory, file_name)
-# 	return None  # Return None if no file with the specified extension is found
