@@ -52,7 +52,8 @@ def download_with_jdownloader(url, mode):
 	return os.path.join(C.JDOWNLOADER_DOWNLOAD_PATH, filename)
 
 
-def wait_for_file(directory, name, mode, secs):
+def wait_for_file(directory, filename, mode, secs):
+	log.info(f"wait_for_file :: directory={directory} filename={filename} mode={mode} secs={secs})")
 	extension = C.MP4_EXTENSION
 	if mode == C.MP3:
 		extension = C.MP3_EXTENSION
@@ -62,7 +63,7 @@ def wait_for_file(directory, name, mode, secs):
 			log.info(f"Files detected in directory {directory}:")
 			for file in files:
 				log.info(file)
-				if name[:-4] + C.POINT + extension in file:
+				if filename[:-4] + C.POINT + extension in file:
 					return
 		else:
 			log.info(f"No {extension.upper()} files detected in directory {directory}")

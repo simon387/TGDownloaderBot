@@ -1,3 +1,7 @@
+Version 1.0.67
+- added logs
+- update test
+
 Version 1.0.66
 - added logs
 - clean code
