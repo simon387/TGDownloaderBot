@@ -46,7 +46,7 @@ def download_with_jdownloader(url, mode):
 	#	"jobUUIDs": [],
 	#	"maxResults": -1,
 	#	"packageUUIDs": [],
-	#à	"password": True,
+	#	"password": True,
 	#	"priority": True,
 	#	"running": True,
 	#	"skipped": True,
@@ -58,8 +58,8 @@ def download_with_jdownloader(url, mode):
 	#
 	name = ""
 	for e in tmp2:
-		if e.url == url:
-			name = e.name
+		if e['url'] == url:
+			name = e['name']
 	# wait_for_file
 	wait_for_file(C.JDOWNLOADER_DOWNLOAD_PATH, name, mode, 1)
 	#
