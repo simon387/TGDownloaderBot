@@ -4,7 +4,7 @@ import signal
 from telegram import Update
 from telegram.ext import CallbackContext
 
-from src.service.log_service import log_bot_event
+from src.service.LogService import log_bot_event
 from src.util import Constants as C
 
 

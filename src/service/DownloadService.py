@@ -13,9 +13,9 @@ from telegram.ext import CallbackContext
 # noinspection PyProtectedMember
 from yt_dlp import DownloadError
 
-from src.service.link_service import is_from_yt
-from src.service.log_service import log_bot_event
-from src.service.telegram_service import send_media
+from src.service.LinkService import is_from_yt
+from src.service.LogService import log_bot_event
+from src.service.TelegramService import send_media
 from src.util import Constants as C
 
 

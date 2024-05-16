@@ -8,9 +8,9 @@ from telegram.constants import ParseMode
 from telegram.error import TelegramError
 from telegram.ext import CallbackContext
 
-from src.service.ftp_service import upload_to_ftp
-from src.service.link_service import contains_valid_url, extract_first_url
-from src.service.log_service import log_bot_event
+from src.service.FTPService import upload_to_ftp
+from src.service.LinkService import contains_valid_url, extract_first_url
+from src.service.LogService import log_bot_event
 from src.util import Constants as C
 
 

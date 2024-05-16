@@ -5,11 +5,11 @@ from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, AIORateLimiter, CallbackQueryHandler, MessageHandler, filters
 
 from src.override.BotApp import BotApp
-from src.service.download_service import download_clicked
-from src.service.error_service import error_handler
-from src.service.log_service import post_init, post_shutdown, send_version
-from src.service.shutdown_service import send_shutdown
-from src.service.telegram_service import show_download_buttons, chat_check
+from src.service.DownloadService import download_clicked
+from src.service.ErrorService import error_handler
+from src.service.LogService import post_init, post_shutdown, send_version
+from src.service.ShutdownService import send_shutdown
+from src.service.TelegramService import show_download_buttons, chat_check
 from src.util import Constants as C
 
 log.basicConfig(
