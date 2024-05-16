@@ -12,7 +12,7 @@ from src.util import Constants as C
 def download_with_jdownloader(url, mode):
 	log.info(f"Using download method #3 url={url} mode={mode}")
 	jd = myjdapi.Myjdapi()
-	jd.set_app_key("EXAMPLE")
+	jd.set_app_key("EXAMPLE")  # doesn't matter
 	jd.connect(C.JDOWNLOADER_USER, C.JDOWNLOADER_PASS)
 	jd.update_devices()
 	device = jd.get_device(C.JDOWNLOADER_DEVICE_NAME)
