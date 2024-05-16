@@ -2,8 +2,7 @@ import logging as log
 from logging.handlers import RotatingFileHandler
 
 from telegram import Update
-from telegram.ext import ApplicationBuilder, CommandHandler, AIORateLimiter, CallbackQueryHandler, MessageHandler, \
-	filters
+from telegram.ext import ApplicationBuilder, CommandHandler, AIORateLimiter, CallbackQueryHandler, MessageHandler, filters
 
 from src.override.BotApp import BotApp
 from src.service.download_service import download_clicked
