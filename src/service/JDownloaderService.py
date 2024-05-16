@@ -73,7 +73,7 @@ def wait_for_file(directory, name, mode, secs):
 			log.info(f"Files detected in directory {directory}:")
 			for file in files:
 				log.info(file)
-				if name[:-4] in file:
+				if name[:-4] + "." + extension in file:
 					return
 		else:
 			log.info(f"No {extension.upper()} files detected in directory {directory}")
