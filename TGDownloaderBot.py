@@ -167,7 +167,8 @@ async def show_download_buttons(update: Update, context: CallbackContext, answer
 		]
 		mu = InlineKeyboardMarkup(keyboard)
 		txt = f'<a href="tg://btn/{str(base64.urlsafe_b64encode(msg.encode(C.UTF8)))}">\u200b</a>{C.VALID_LINK_MESSAGE}'
-		await context.bot.send_message(chat_id=update.effective_chat.id, text=txt, reply_markup=mu, parse_mode='HTML', reply_to_message_id=update.message.id)
+		message_id = update.message.id
+		await context.bot.send_message(chat_id=update.effective_chat.id, text=txt, reply_markup=mu, parse_mode=ParseMode.HTML, reply_to_message_id=message_id)
 	else:
 		if answer_with_error:
 			await context.bot.send_message(chat_id=update.effective_chat.id, text=C.ERROR_CANT_DOWNLOAD)
@@ -210,14 +211,14 @@ async def download_clicked(update: Update, context: CallbackContext):
 	except DownloadError:
 		log.error(C.ERROR_DOWNLOAD)
 		ydl_opts['format'] = "18"
-		file_path = download_with_yt_dlp(ydl_opts, url)  # if it fails, use yt_dlp with another format, second try
+		file_path = download_with_yt_dlp(ydl_opts, url)  # if it fails with a DownloadError, use yt_dlp with another format, second try
 	except Exception as e:
-		file_path = await download_with_you_get(e, url)  # if it still fails, the 3# try is with you_get
+		file_path = await download_with_you_get(e, url)  # if the error is another one, the 2# try is with you_get
 	if file_path is not None:
 		await context.bot.send_message(chat_id=update.effective_chat.id, text=C.DOWNLOAD_COMPLETE_MESSAGE)
 		await send_media(mode, file_path, context, update)
 	else:
-		file_path = download_with_jdownloader(url, mode)  # if something fails again, the 4# try is with the jDownloader2 integration
+		file_path = download_with_jdownloader(url, mode)  # if something fails again, the 3# try is with the jDownloader2 integration
 		if file_path is not None:
 			await context.bot.send_message(chat_id=update.effective_chat.id, text=C.DOWNLOAD_COMPLETE_MESSAGE)
 			await send_media(mode, file_path, context, update)
@@ -228,7 +229,7 @@ async def download_clicked(update: Update, context: CallbackContext):
 # download method #1
 # @return file_path
 def download_with_yt_dlp(ydl_opts, url):
-	log.info("Using download method #1")
+	log.info(f"Using download method #1 url={url} ydl_opts={ydl_opts}")
 	with yt_dlp.YoutubeDL(ydl_opts) as ydl:
 		info = ydl.extract_info(url, download=False)
 		file_path = ydl.prepare_filename(info)
@@ -240,7 +241,7 @@ def download_with_yt_dlp(ydl_opts, url):
 # download method #2
 # @return file_path
 async def download_with_you_get(e, url):
-	log.info("Using download method #2")
+	log.info(f"Using download method #2 url={url}")
 	path = C.YOU_GET_DWN_PATH_PREFIX + generate_random_string(16)
 	log.error('Switching to you-get due to Download KO:', str(e))
 	command = ["you-get", "-k", "-f", "-o", path, "-O", C.VIDEO_FILE_NAME, url]
@@ -262,7 +263,7 @@ async def download_with_you_get(e, url):
 # download method #3
 # @return file_path
 def download_with_jdownloader(url, mode):
-	log.info("Using download method #3")
+	log.info(f"Using download method #3 url={url} mode={mode}")
 	jd = myjdapi.Myjdapi()
 	jd.set_app_key("EXAMPLE")
 	jd.connect(C.JDOWNLOADER_USER, C.JDOWNLOADER_PASS)
@@ -284,7 +285,7 @@ def download_with_jdownloader(url, mode):
 		}])
 	#
 	# wait_for_file
-	wait_for_file(C.JDOWNLOADER_DOWNLOAD_PATH, mode)
+	wait_for_file(C.JDOWNLOADER_DOWNLOAD_PATH, mode, 1)
 	#
 	if mode == C.MP3:
 		return get_first_file_by_extension(C.JDOWNLOADER_DOWNLOAD_PATH, C.MP3_EXTENSION)
@@ -357,20 +358,20 @@ def delete_files_in_directory(directory):
 			log.error(f"Error deleting {file_path}: {e}")
 
 
-def wait_for_file(directory, mode):
+def wait_for_file(directory, mode, secs):
 	extension = C.MP4_EXTENSION
 	if mode == C.MP3:
 		extension = C.MP3_EXTENSION
 	while True:
 		files = [file for file in os.listdir(directory) if file.endswith(C.POINT + extension)]
 		if files:
-			log.info("Files detected in directory:")
+			log.info(f"Files detected in directory {directory}:")
 			for file in files:
 				log.info(file)
 			return files
 		else:
 			log.info(f"No {extension.upper()} files detected in directory {directory}")
-		time.sleep(1)  # Adjust the sleep time as needed
+		time.sleep(secs)
 
 
 def get_first_file_by_extension(directory, extension):
@@ -381,7 +382,7 @@ def get_first_file_by_extension(directory, extension):
 
 
 async def upload_to_ftp(update: Update, context: CallbackContext, local_file_path):
-	log.info(C.FTP_MESSAGE_START)
+	log.info(f"{C.FTP_MESSAGE_START} local_file_path={local_file_path}")
 	await context.bot.send_message(chat_id=update.effective_chat.id, text=C.FTP_MESSAGE_START)
 	ftp = C.EMPTY
 	try:
@@ -389,7 +390,6 @@ async def upload_to_ftp(update: Update, context: CallbackContext, local_file_pat
 		ftp.login(C.FTP_USER, C.FTP_PASS)
 		ftp.cwd(C.FTP_REMOTE_FOLDER)
 		with open(local_file_path, 'rb') as file:
-			# remote_file = re.sub(r"\s+", "_", local_file_path.replace('download\\', C.EMPTY).replace('download/', C.EMPTY))
 			remote_file = os.path.basename(local_file_path)
 			ftp.storbinary('STOR ' + remote_file, file)
 		log.info('Upload OK')
