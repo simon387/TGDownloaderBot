@@ -19,7 +19,7 @@ def download_with_jdownloader(url, mode):
 	#
 	delete_files_in_directory(C.JDOWNLOADER_DOWNLOAD_PATH)
 	#
-	device.linkgrabber.add_links(
+	tmp = device.linkgrabber.add_links(
 		params=[{
 			"autostart": True,
 			"links": url,
@@ -30,7 +30,36 @@ def download_with_jdownloader(url, mode):
 			"destinationFolder": C.JDOWNLOADER_DOWNLOAD_PATH,  # TODO For accuracy, it's better to dynamically change this line for concurrence
 			"overwritePackagizerRules": True  # was False
 		}])
+
+	tmp2 = device.downloads.query_links()
+	#params=[{
+	#	"addedDate": True,
+	#	"bytesLoaded": True,
+	#	"bytesTotal": True,
+	#	"comment": True,
+	#	"enabled": True,
+	#	"eta": True,
+	#	"extractionStatus": True,
+	#	"finished": True,
+	#	"finishedDate": True,
+	#	"host": True,
+	#	"jobUUIDs": [],
+	#	"maxResults": -1,
+	#	"packageUUIDs": [],
+	#à	"password": True,
+	#	"priority": True,
+	#	"running": True,
+	#	"skipped": True,
+	#	"speed": True,
+	#	"startAt": 0,
+	#	"status": True,
+	#	"url": True
+	#}])
 	#
+	name = ""
+	for e in tmp2:
+		if e.url == url:
+			name = e.name
 	# wait_for_file
 	wait_for_file(C.JDOWNLOADER_DOWNLOAD_PATH, mode, 1)
 	#
