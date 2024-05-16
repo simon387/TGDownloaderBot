@@ -61,7 +61,7 @@ def download_with_jdownloader(url, mode):
 		if e.url == url:
 			name = e.name
 	# wait_for_file
-	wait_for_file(C.JDOWNLOADER_DOWNLOAD_PATH, mode, 1)
+	wait_for_file(C.JDOWNLOADER_DOWNLOAD_PATH, name, mode, 1)
 	#
 	if mode == C.MP3:
 		return get_first_file_by_extension(C.JDOWNLOADER_DOWNLOAD_PATH, C.MP3_EXTENSION)
@@ -80,7 +80,7 @@ def delete_files_in_directory(directory):
 			log.error(f"Error deleting {file_path}: {e}")
 
 
-def wait_for_file(directory, mode, secs):
+def wait_for_file(directory, name, mode, secs):
 	extension = C.MP4_EXTENSION
 	if mode == C.MP3:
 		extension = C.MP3_EXTENSION
@@ -90,7 +90,8 @@ def wait_for_file(directory, mode, secs):
 			log.info(f"Files detected in directory {directory}:")
 			for file in files:
 				log.info(file)
-			return files
+				if name in file:
+					return
 		else:
 			log.info(f"No {extension.upper()} files detected in directory {directory}")
 		time.sleep(secs)
