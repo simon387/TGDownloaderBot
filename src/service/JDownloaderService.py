@@ -36,9 +36,13 @@ def download_with_jdownloader(url, mode):
 		log.info("Waiting for links...")
 		time.sleep(2)
 	#
+	extension = C.MP4_EXTENSION
+	if mode == C.MP3:
+		extension = C.MP3_EXTENSION
+	#
 	filename = C.EMPTY
 	for link in links:
-		if link['url'] == url:
+		if link['url'] == url and filename[-3:] == extension:
 			filename = link['name']
 			log.info("Filename found!")
 			break
@@ -47,16 +51,13 @@ def download_with_jdownloader(url, mode):
 		return None
 	#
 	# wait for file being downloaded
-	wait_for_file(C.JDOWNLOADER_DOWNLOAD_PATH, filename, mode, 1)
+	wait_for_file(C.JDOWNLOADER_DOWNLOAD_PATH, filename, extension, 1)
 	#
 	return os.path.join(C.JDOWNLOADER_DOWNLOAD_PATH, filename)
 
 
-def wait_for_file(directory, filename, mode, secs):
-	log.info(f"wait_for_file :: directory={directory} filename={filename} mode={mode} secs={secs})")
-	extension = C.MP4_EXTENSION
-	if mode == C.MP3:
-		extension = C.MP3_EXTENSION
+def wait_for_file(directory, filename, extension, secs):
+	log.info(f"wait_for_file :: directory={directory} filename={filename} extension={extension} secs={secs})")
 	while True:
 		files = [file for file in os.listdir(directory) if file.endswith(C.POINT + extension)]
 		if files:
