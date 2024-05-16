@@ -42,7 +42,7 @@ def download_with_jdownloader(url, mode):
 	#
 	filename = C.EMPTY
 	for link in links:
-		if link['url'] == url and filename[-3:] == extension:
+		if link['url'] == url and link['name'][-3:] == extension:
 			filename = link['name']
 			log.info("Filename found!")
 			break
