@@ -10,6 +10,7 @@ from src.service.ErrorService import error_handler
 from src.service.LogService import post_init, post_shutdown, send_version
 from src.service.ShutdownService import send_shutdown
 from src.service.TelegramService import show_download_buttons, chat_check
+from src.test.Test import test
 from src.util import Constants as C
 
 log.basicConfig(
@@ -42,6 +43,7 @@ if __name__ == '__main__':
 	application.add_handler(CommandHandler('version', send_version))
 	application.add_handler(CommandHandler('shutdown', send_shutdown))
 	application.add_handler(CommandHandler('download', show_download_buttons))
+	application.add_handler(CommandHandler('test', test))
 	application.add_handler(CallbackQueryHandler(download_clicked))
 	application.add_handler(MessageHandler(filters.TEXT, chat_check))
 	application.add_error_handler(error_handler)

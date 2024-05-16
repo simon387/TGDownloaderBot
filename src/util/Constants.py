@@ -49,6 +49,7 @@ ERROR_DOWNLOAD = "Error on download, scaling down format"
 WAIT_MESSAGE = "Wait please..."
 DOWNLOAD_COMPLETE_MESSAGE = "... download completed"
 DOWNLOAD_JSON_ERROR = "Download error!"
+ERROR_PARAMETER_NEEDED_MESSAGE = "This command needs a parameter!"
 
 # jdownloader
 JDOWNLOADER_DOWNLOAD_PATH = config.get(APPLICATION, "jdownloader.download.path")

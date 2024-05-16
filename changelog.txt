@@ -1,3 +1,6 @@
+Version 1.0.64
+- added hidden test function
+
 Version 1.0.63
 - better jDownloader2 integration
 
