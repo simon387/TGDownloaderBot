@@ -32,6 +32,9 @@ def download_with_jdownloader(url, mode):
 		}])
 	#
 	links = device.downloads.query_links()
+	while not links:
+		links = device.downloads.query_links()
+		time.sleep(2)
 	#
 	filename = C.EMPTY
 	for link in links:
