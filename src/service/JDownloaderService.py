@@ -29,34 +29,48 @@ def download_with_jdownloader(url, mode):
 			"overwritePackagizerRules": True  # was False
 		}])
 	#
-	# wait for jDownloader link interceptor
+	links = wait_for_links(device, 2)  # wait for jDownloader link interceptor
+	#
+	extension = get_extension(mode)
+	#
+	filename = get_filename(extension, links, url)
+	#
+	if filename == C.EMPTY:
+		log.error("Something went wrong! No filename found")
+		return None
+	#
+	wait_for_file_being_downloaded(C.JDOWNLOADER_DOWNLOAD_PATH, filename, extension, 1)
+	#
+	return os.path.join(C.JDOWNLOADER_DOWNLOAD_PATH, filename)
+
+
+def wait_for_links(device, secs):
 	links = device.downloads.query_links()
 	while not links:
 		links = device.downloads.query_links()
 		log.info("Waiting for links...")
-		time.sleep(2)
-	#
+		time.sleep(secs)
+	return links
+
+
+def get_extension(mode):
 	extension = C.MP4_EXTENSION
 	if mode == C.MP3:
 		extension = C.MP3_EXTENSION
-	#
+	return extension
+
+
+def get_filename(extension, links, url):
 	filename = C.EMPTY
 	for link in links:
 		if link['url'] == url and link['name'][-3:] == extension:
 			filename = link['name']
 			log.info("Filename found!")
 			break
-	if filename == C.EMPTY:
-		log.error("Something went wrong! No filename found")
-		return None
-	#
-	# wait for file being downloaded
-	wait_for_file(C.JDOWNLOADER_DOWNLOAD_PATH, filename, extension, 1)
-	#
-	return os.path.join(C.JDOWNLOADER_DOWNLOAD_PATH, filename)
+	return filename
 
 
-def wait_for_file(directory, filename, extension, secs):
+def wait_for_file_being_downloaded(directory, filename, extension, secs):
 	log.info(f"wait_for_file :: directory={directory} filename={filename} extension={extension} secs={secs})")
 	while True:
 		files = [file for file in os.listdir(directory) if file.endswith(C.POINT + extension)]
