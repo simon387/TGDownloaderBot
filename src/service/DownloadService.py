@@ -17,6 +17,7 @@ from src.util import Constants as C
 
 # this is the core of the business logic
 async def download_clicked(update: Update, context: CallbackContext):
+	log.info("==================================================================== \n\n")
 	log_bot_event(update, 'download_clicked')
 	query = update.callback_query
 	mode = query.data
