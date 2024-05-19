@@ -71,6 +71,12 @@ download - download a video from an url
 shutdown - shutdown the bot
 ```
 
+### jDownloader2 setup example
+
+![image info](./assets/jd1.png)
+![image info](./assets/jd2.png)
+![image info](./assets/jd3.png)
+
 ## BotFather creation's infos
 
 Done! Congratulations on your new bot. You will find it at t.me/TG_DownloaderBot. You can now add a description, about section
