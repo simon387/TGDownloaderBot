@@ -3,11 +3,13 @@ import logging
 
 config = configparser.RawConfigParser()
 config.read("config.properties")
+
 # application's secrets
 SECRETS = "secrets"
 TOKEN = config.get(SECRETS, "telegram.token")
 TELEGRAM_GROUP_ID = config.get(SECRETS, "telegram.group.id")
 TELEGRAM_DEVELOPER_CHAT_ID = config.get(SECRETS, "telegram.developer.chat.id")
+
 # application's settings
 APPLICATION = "application"
 RESTART_FLAG = config.get(APPLICATION, "restart.flag")
@@ -25,12 +27,15 @@ elif case == "error":
 	LOG_LEVEL = logging.ERROR
 else:
 	LOG_LEVEL = logging.DEBUG
+
 # ftp
 FTP_URL = config.get(APPLICATION, "ftp.url")
 FTP_HOST = config.get(APPLICATION, "ftp.host")
 FTP_USER = config.get(APPLICATION, "ftp.user")
 FTP_PASS = config.get(APPLICATION, "ftp.pass")
 FTP_REMOTE_FOLDER = config.get(APPLICATION, "ftp.remote.folder")
+
+# youtube
 YOUTUBE_USER = config.get(APPLICATION, "youtube.user")
 YOUTUBE_PASS = config.get(APPLICATION, "youtube.pass")
 COOKIES_PATH = config.get(APPLICATION, "cookies.path")

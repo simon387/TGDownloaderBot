@@ -1,3 +1,6 @@
+Version 1.0.74
+- code refactoring
+
 Version 1.0.73
 - update readme
 
