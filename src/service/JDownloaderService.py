@@ -39,7 +39,7 @@ def download_with_jdownloader(url, mode):
 		log.error("Something went wrong! No filename found")
 		return None
 	#
-	wait_for_file_being_downloaded(C.JDOWNLOADER_DOWNLOAD_PATH, filename, extension, 1)
+	filename = wait_for_file_being_downloaded(C.JDOWNLOADER_DOWNLOAD_PATH, filename, extension, 1)
 	#
 	return os.path.join(C.JDOWNLOADER_DOWNLOAD_PATH, filename)
 
@@ -79,7 +79,8 @@ def wait_for_file_being_downloaded(directory, filename, extension, secs):
 			for file in files:
 				log.info(file)
 				if filename in file:
-					return
+					log.info(f"filename={filename}, file={file}")
+					return file
 		else:
 			log.info(f"No {extension.upper()} files detected in directory {directory}")
 		time.sleep(secs)
