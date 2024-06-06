@@ -6,7 +6,7 @@ import sys
 import time as time_os
 import traceback
 
-import telegram
+import telegram.error
 from telegram import Update
 from telegram.constants import ParseMode
 from telegram.ext import ContextTypes
