@@ -1,3 +1,6 @@
+Version 1.0.77
+- added dowdload links timeout on JD2
+
 Version 1.0.76
 - fix telegram.error.NetworkError
 

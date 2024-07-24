@@ -50,6 +50,9 @@ def wait_for_links(device, secs):
 		links = device.downloads.query_links()
 		log.info("Waiting for links...")
 		time.sleep(secs)
+		if secs > 60:
+			log.error("Link wait timeout exceeded")
+			break
 	return links
 
 
