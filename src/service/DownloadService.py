@@ -48,3 +48,5 @@ async def download_clicked(update: Update, context: CallbackContext):
 			await send_media(mode, file_path, context, update)
 		else:
 			await context.bot.send_message(chat_id=update.effective_chat.id, text=C.DOWNLOAD_JSON_ERROR)
+			await context.bot.send_message(chat_id=update.effective_chat.id, text="Contacting the dev...")
+			await context.bot.send_message(chat_id=C.TELEGRAM_DEVELOPER_CHAT_ID, text="Someone got a problem with downloading a video.")
