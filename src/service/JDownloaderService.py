@@ -77,6 +77,7 @@ def get_filename(extension, links, url):
 
 def wait_for_file_being_downloaded(directory, filename, extension, secs):
 	log.info(f"wait_for_file :: directory={directory} filename={filename} extension={extension} secs={secs})")
+	waited = 0
 	while True:
 		files = [file for file in os.listdir(directory) if file.endswith(C.POINT + extension)]
 		if files:
@@ -89,3 +90,7 @@ def wait_for_file_being_downloaded(directory, filename, extension, secs):
 		else:
 			log.info(f"No {extension.upper()} files detected in directory {directory}")
 		time.sleep(secs)
+		waited += secs
+		if waited > 60:
+			log.error("File wait timeout exceeded")
+			break

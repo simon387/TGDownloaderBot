@@ -1,3 +1,6 @@
+Version 1.0.79
+- added dowdload timeout on JD2
+
 Version 1.0.78
 - adding contact dev function
 - added other libs tests
