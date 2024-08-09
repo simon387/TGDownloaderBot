@@ -91,6 +91,6 @@ def wait_for_file_being_downloaded(directory, filename, extension, secs):
 			log.info(f"No {extension.upper()} files detected in directory {directory}")
 		time.sleep(secs)
 		waited += secs
-		if waited > 60:
+		if waited > 300:
 			log.error("File wait timeout exceeded")
 			break

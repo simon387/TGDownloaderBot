@@ -1,3 +1,6 @@
+Version 1.0.80
+- increased timeoud on JD2 download
+
 Version 1.0.79
 - added dowdload timeout on JD2
 
