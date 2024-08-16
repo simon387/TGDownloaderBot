@@ -73,6 +73,8 @@ shutdown - shutdown the bot
 
 ### jDownloader2 setup example
 
+**On linux, do not run it from package manager, it's better from normal setup**
+
 ![image info](./assets/jd1.png)
 ![image info](./assets/jd2.png)
 ![image info](./assets/jd3.png)
