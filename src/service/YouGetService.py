@@ -13,7 +13,7 @@ async def download_with_you_get(e, url):
 	log.info(f"Using download method #2 url={url}")
 	path = C.YOU_GET_DWN_PATH_PREFIX + generate_random_string(16)
 	log.error('Switching to you-get due to Download KO:', str(e))
-	command = ["you-get", "-k", "-f", "-o", path, "-O", C.VIDEO_FILE_NAME, url]
+	command = ["you-get", "--debug", "-k", "-f", "-o", path, "-O", C.VIDEO_FILE_NAME, url]
 	log.info(f"you-get -k -f -o {path} -O {C.VIDEO_FILE_NAME} {url}")
 	result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 	if result.returncode == 0:

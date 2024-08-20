@@ -29,11 +29,17 @@ def download_with_jdownloader(url, mode):
 			"overwritePackagizerRules": True  # was False
 		}])
 	#
+	log.info(f"Getting links...")
 	links = wait_for_links(device, 2)  # wait for jDownloader link interceptor
+	log.info(f"done.")
 	#
+	log.info(f"Getting extension...")
 	extension = get_extension(mode)
+	log.info(f"done.")
 	#
+	log.info(f"Getting filename...")
 	filename = get_filename(extension, links, url)
+	log.info(f"done.")
 	#
 	if filename == C.EMPTY:
 		log.error("Something went wrong! No filename found")

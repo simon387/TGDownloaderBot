@@ -1,3 +1,7 @@
+Version 1.0.81
+- added more logs
+- added --debug flag on you-get download method
+
 Version 1.0.80
 - increased timeoud on JD2 download
 
