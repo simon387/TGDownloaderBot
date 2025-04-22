@@ -13,3 +13,4 @@ __pycache__
 *.ytdl
 *.srt
 *.swp
+.vscode/
